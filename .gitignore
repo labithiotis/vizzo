@@ -1,0 +1,16 @@
+node_modules/
+dist/
+.wrangler/
+.output/
+.tanstack/
+.vite/
+.env
+.env.*
+!.env.example
+.dev.vars
+.dev.vars.*
+coverage/
+*.log
+.DS_Store
+.turbo/
+.worktrees/

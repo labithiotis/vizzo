@@ -1,0 +1,26 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "tasks": {
+    "build": {
+      "inputs": ["src/**", "*.json"],
+      "outputs": ["dist/**", ".output/**"]
+    },
+    "lint": {
+      "inputs": ["src/**", "biome.json", "*.json"],
+      "outputs": []
+    },
+    "format": {
+      "inputs": ["src/**", "biome.json", "*.json"],
+      "outputs": []
+    },
+    "test": {
+      "inputs": ["src/**", "*.json"],
+      "outputs": [],
+      "cache": false
+    },
+    "typecheck": {
+      "inputs": ["src/**", "tsconfig.json"],
+      "outputs": []
+    }
+  }
+}
