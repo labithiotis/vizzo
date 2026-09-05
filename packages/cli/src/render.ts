@@ -59,6 +59,7 @@ function toRenderOptions(raw: string, cli: RenderCliOptions, formatFallback: 'sv
     theme: cli.theme ?? file.theme,
     preset: (cli.preset as SocialPresetName | undefined) ?? file.preset,
     background: cli.background ?? file.background,
+    font: cli.font,
   };
 }
 

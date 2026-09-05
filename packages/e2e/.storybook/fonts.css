@@ -1,0 +1,11 @@
+/* The same Roboto the CLI rasterizes with, so the browser and the PNG can be compared glyph for glyph. */
+@font-face {
+  font-family: "Vizzo Roboto";
+  src: url("../../core/fonts/Roboto-Regular.ttf") format("truetype");
+  font-weight: 100 900;
+  font-display: block;
+}
+
+body {
+  font-family: "Vizzo Roboto", sans-serif;
+}

@@ -24,6 +24,7 @@ Options:
   -t, --theme <name>      light | dark
   -p, --preset <name>     og | twitter | linkedin | discord
       --background <css>  Raster background color (png/webp only)
+      --font <path>       .ttf/.otf file to draw text with (default: Roboto)
       --help              Show this message
 `;
 

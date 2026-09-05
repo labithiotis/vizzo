@@ -82,6 +82,7 @@ Argument rules:
 | `--theme <name>` | `-t` | `light` \| `dark` |
 | `--preset <name>` | `-p` | `og` (1200×630) \| `twitter` (1200×675) \| `linkedin` (1200×627) \| `discord` (1200×630) |
 | `--background <css>` | | Raster background color, PNG/WebP only |
+| `--font <path>` | | `.ttf`/`.otf` file to draw text with, PNG/WebP only (default: bundled Roboto) |
 | `--help` | | Usage (`-h` alone also means help; with other args `-h` is `--height`) |
 | `--version` | `-v` | Version |
 
@@ -507,6 +508,7 @@ handing rows to a mark.
 | Bars are hairlines | The categorical axis is `point`; use `band`. |
 | Cartesian marks vanished | A `pie` mark is present, so only the pie renders. |
 | PNG has a transparent background | Pass `--background '#ffffff'`. |
+| PNG/WebP text renders in Roboto, not the SVG's font | Rasterizing uses the bundled Roboto. Pass `--font <path>` to use another `.ttf`/`.otf`. |
 
 ## Node SDK
 

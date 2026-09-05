@@ -9,6 +9,7 @@ export interface RenderCliOptions {
   theme?: 'light' | 'dark';
   preset?: string;
   background?: string;
+  font?: string;
   help?: boolean;
 }
 
@@ -24,6 +25,7 @@ export function parseRenderArgs(argv: readonly string[]): RenderCliOptions {
       theme: { type: 'string', short: 't' },
       preset: { type: 'string', short: 'p' },
       background: { type: 'string' },
+      font: { type: 'string' },
       help: { type: 'boolean' },
     },
   });
@@ -37,6 +39,7 @@ export function parseRenderArgs(argv: readonly string[]): RenderCliOptions {
     theme: values.theme as RenderCliOptions['theme'],
     preset: values.preset,
     background: values.background,
+    font: values.font,
     help: values.help,
   };
 }

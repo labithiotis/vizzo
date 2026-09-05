@@ -25,6 +25,10 @@ requires a browser, Playwright, or Canvas at render time.
   to a real TanStack Charts call, it doesn't belong there.
 - Keep startup fast and dependencies minimal; the CLI must run cold in a
   GitHub Action or a Discord bot without a warmup step.
+- `packages/core/fonts/Roboto-Regular.ttf` is vendored because resvg-wasm
+  cannot read the host's font directories; without it every `<text>` node is
+  dropped from PNG and WebP. `packages/cli`'s build copies it to
+  `packages/cli/fonts` (generated, git-ignored, published).
 - The published `vizzo` package must work under plain Node, not just Bun.
   Anything it does at runtime (loading the resvg/webp `.wasm` files, in
   particular) has to survive `bun build --target=node` and execution with
@@ -38,8 +42,12 @@ format, theme, preset, background }` and the JSON chart-definition shapes.
   Charts scene, serializes it to SVG, and rasterizes to PNG/WebP with resvg.
 - `packages/cli` — the published `vizzo` package: the `vizzo` binary and the
   `render()` re-export for `import { render } from 'vizzo'`.
-- `packages/examples` — source chart definitions (`charts/*.json`) and the
-  script that renders them into `examples/*.svg` and `docs/public/examples/`.
+- `packages/e2e` — everything that exercises the CLI end to end: the source
+  chart definitions (`charts/*.json`), the script that renders them into
+  `examples/*.svg` and `docs/public/examples/`, the visual regression test with
+  its committed `baselines/*.png`, and the Storybook that shows each example
+  rendered live by TanStack Charts beside the PNG vizzo produced from the same
+  JSON.
 - `docs` — the vizzo.dev marketing site (TanStack Start on Cloudflare Workers).
 
 ## Code
@@ -90,13 +98,23 @@ left-0`, and `grow`/`shrink` over verbose flex equivalents.
   `runRender()`), not internal hydration details.
 - Tests are colocated next to source (`*.test.ts`).
 - Regenerate `examples/*.svg` and `docs/public/examples/*.svg` with
-  `bun run --cwd packages/examples render` after changing an example
+  `bun run --cwd packages/e2e render` after changing an example
   definition; don't hand-edit generated SVGs.
+- Visual changes are caught by `packages/e2e/src/visual.test.ts`, which
+  renders every `charts/*.json` to PNG and pixel-diffs it against
+  `baselines/*.png`. A failure writes the diff to `packages/e2e/.diffs/`.
+  Look at that image first; only run `bun run --cwd packages/e2e baseline`
+  once the new rendering is the intended one, and commit the changed baselines
+  with the change that caused them.
+- `bun run --cwd packages/e2e storybook` shows each example rendered live by
+  TanStack Charts beside the vizzo PNG, side by side or as a difference
+  overlay. The browser render is the reference: where the two disagree,
+  `hydrate.ts` or the SVG serializer is wrong, not the browser.
 
 ## Releasing
 
 `vizzo` (`packages/cli`) is the only published package; `@vizzo/core`,
-`@vizzo/schemas`, and `@vizzo/examples` are private workspace-only and get
+`@vizzo/schemas`, and `@vizzo/e2e` are private workspace-only and get
 bundled into it at build time.
 
 Cut a release by running the **Release** workflow from GitHub Actions

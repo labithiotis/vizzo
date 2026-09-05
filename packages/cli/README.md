@@ -104,6 +104,18 @@ vizzo chart.json --preset og
 
 Presets: `og`, `twitter`, `linkedin`, `discord`.
 
+## Fonts
+
+PNG and WebP are rasterized with a bundled copy of Roboto, so text renders the
+same everywhere — no system fonts, no network. Point `--font` at a `.ttf` or
+`.otf` to use something else:
+
+```bash
+vizzo chart.json chart.png --font /System/Library/Fonts/Supplemental/Arial.ttf
+```
+
+SVG output carries no font data; it renders in whatever the viewer has.
+
 ## TypeScript example
 
 ```ts
@@ -126,14 +138,15 @@ type RenderOptions = {
   theme?: 'light' | 'dark';
   preset?: 'og' | 'twitter' | 'linkedin' | 'discord';
   background?: string;
+  font?: string;
 };
 ```
 
 ## Examples
 
-See [`packages/examples/charts`](packages/examples/charts) for the source
-definitions and [`examples/`](examples) for their rendered output: line, bar,
-area, pie, multi-series, and time-series charts.
+See [`packages/e2e/charts`](packages/e2e/charts) for the source definitions
+and [`examples/`](examples) for their rendered output: line, bar, area, pie,
+multi-series, and time-series charts.
 
 ## Repository
 

@@ -34,13 +34,14 @@
   },
   "files": [
     "dist",
+    "fonts",
     "LLM.md"
   ],
   "engines": {
     "node": ">=20.6.0"
   },
   "scripts": {
-    "build": "bun build ./src/cli.ts --target=node --outfile=dist/cli.js && bun build ./src/index.ts --target=node --outfile=dist/index.js",
+    "build": "bun build ./src/cli.ts --target=node --outfile=dist/cli.js && bun build ./src/index.ts --target=node --outfile=dist/index.js && rm -rf fonts && cp -R ../core/fonts fonts",
     "lint": "biome check .",
     "format": "biome check --write .",
     "test": "bun test",

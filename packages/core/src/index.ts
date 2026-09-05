@@ -23,6 +23,7 @@ export interface RenderOptions {
   theme?: ChartThemeName;
   preset?: SocialPresetName;
   background?: string;
+  font?: string;
   ariaLabel?: string;
 }
 
@@ -59,6 +60,7 @@ export async function render(options: RenderOptions): Promise<RenderResult> {
   const svg = toStandaloneSvg(renderChartSvg(scene, { ariaLabel: options.ariaLabel ?? 'Chart' }));
 
   if (format === 'svg') return { format, width, height, data: svg };
-  if (format === 'png') return { format, width, height, data: await svgToPng(svg, options.background) };
-  return { format, width, height, data: await svgToWebp(svg, options.background) };
+  const raster = { background: options.background, font: options.font };
+  if (format === 'png') return { format, width, height, data: await svgToPng(svg, raster) };
+  return { format, width, height, data: await svgToWebp(svg, raster) };
 }
