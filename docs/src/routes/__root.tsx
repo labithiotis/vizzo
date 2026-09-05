@@ -25,6 +25,7 @@ export const Route = createRootRoute({
       { name: 'theme-color', content: '#0e1013', media: '(prefers-color-scheme: dark)' },
     ],
     links: [
+      { rel: 'icon', type: 'image/png', href: '/favicon.png' },
       { rel: 'stylesheet', href: appCss },
       { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
       { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossOrigin: 'anonymous' },
