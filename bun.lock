@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "vizx-monorepo",
+      "name": "vizzo-monorepo",
       "devDependencies": {
         "@biomejs/biome": "2.5.12",
         "@types/bun": "1.4.1",
@@ -13,7 +13,7 @@
       },
     },
     "docs": {
-      "name": "@vizx/docs",
+      "name": "@vizzo/docs",
       "version": "0.1.0",
       "dependencies": {
         "@tanstack/react-router": "1.170.32",
@@ -34,26 +34,26 @@
       },
     },
     "packages/cli": {
-      "name": "vizx",
+      "name": "vizzo",
       "version": "0.1.0",
       "bin": {
-        "vizx": "./dist/cli.js",
+        "vizzo": "./dist/cli.js",
       },
       "dependencies": {
         "@jsquash/webp": "1.5.0",
         "@resvg/resvg-wasm": "2.6.2",
-        "@vizx/core": "workspace:*",
-        "@vizx/schemas": "workspace:*",
+        "@vizzo/core": "workspace:*",
+        "@vizzo/schemas": "workspace:*",
       },
     },
     "packages/core": {
-      "name": "@vizx/core",
+      "name": "@vizzo/core",
       "version": "0.1.0",
       "dependencies": {
         "@jsquash/webp": "1.5.0",
         "@resvg/resvg-wasm": "2.6.2",
         "@tanstack/charts": "0.14.0",
-        "@vizx/schemas": "workspace:*",
+        "@vizzo/schemas": "workspace:*",
         "d3-scale": "4.0.2",
       },
       "devDependencies": {
@@ -61,14 +61,14 @@
       },
     },
     "packages/examples": {
-      "name": "@vizx/examples",
+      "name": "@vizzo/examples",
       "version": "0.1.0",
       "dependencies": {
-        "@vizx/core": "workspace:*",
+        "@vizzo/core": "workspace:*",
       },
     },
     "packages/schemas": {
-      "name": "@vizx/schemas",
+      "name": "@vizzo/schemas",
       "version": "0.1.0",
       "dependencies": {
         "zod": "4.5.4",
@@ -466,13 +466,13 @@
 
     "@vitejs/plugin-react": ["@vitejs/plugin-react@6.1.1", "", { "dependencies": { "@rolldown/pluginutils": "^1.0.1" }, "peerDependencies": { "@rolldown/plugin-babel": "^0.1.7 || ^0.2.0", "babel-plugin-react-compiler": "^1.0.0", "oxc-transform-react": "^0.145.0", "vite": "^8.0.0" }, "optionalPeers": ["@rolldown/plugin-babel", "babel-plugin-react-compiler", "oxc-transform-react"] }, "sha512-yxLaQV9gkhS8ezJqCM6+ndU7mDY6gqAg75NQ+0IjwEI8IYOmQCgkRwHKVSfWXW076DsqMo0Dk+0FK1U+M5RgFw=="],
 
-    "@vizx/core": ["@vizx/core@workspace:packages/core"],
+    "@vizzo/core": ["@vizzo/core@workspace:packages/core"],
 
-    "@vizx/docs": ["@vizx/docs@workspace:docs"],
+    "@vizzo/docs": ["@vizzo/docs@workspace:docs"],
 
-    "@vizx/examples": ["@vizx/examples@workspace:packages/examples"],
+    "@vizzo/examples": ["@vizzo/examples@workspace:packages/examples"],
 
-    "@vizx/schemas": ["@vizx/schemas@workspace:packages/schemas"],
+    "@vizzo/schemas": ["@vizzo/schemas@workspace:packages/schemas"],
 
     "ansis": ["ansis@4.3.1", "", {}, "sha512-BJ8/l4R5LRE7hW9WdSuGYrLSHi2ynxeFpDFbH0K/CgNeY/tyhk+vO6TYxXC5r5CpUhNVX310xzPsN/H9lCdfOA=="],
 
@@ -728,7 +728,7 @@
 
     "vitefu": ["vitefu@1.1.3", "", { "peerDependencies": { "vite": "^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0" }, "optionalPeers": ["vite"] }, "sha512-ub4okH7Z5KLjb6hDyjqrGXqWtWvoYdU3IGm/NorpgHncKoLTCfRIbvlhBm7r0YstIaQRYlp4yEbFqDcKSzXSSg=="],
 
-    "vizx": ["vizx@workspace:packages/cli"],
+    "vizzo": ["vizzo@workspace:packages/cli"],
 
     "wasm-feature-detect": ["wasm-feature-detect@1.9.0", "", {}, "sha512-zonE+xlIIYtxPy++L24ow0hAD8CICb4+FgPyROd3buyXIqsJvUEDkBgfCCoXOd1Hu3DUr0GOfnPIdcGV+YpNaA=="],
 

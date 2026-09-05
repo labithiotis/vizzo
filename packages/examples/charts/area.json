@@ -1,0 +1,34 @@
+{
+  "definition": {
+    "marks": [
+      {
+        "type": "areaY",
+        "data": [
+          { "day": "Mon", "users": 120 },
+          { "day": "Tue", "users": 156 },
+          { "day": "Wed", "users": 142 },
+          { "day": "Thu", "users": 189 },
+          { "day": "Fri", "users": 205 },
+          { "day": "Sat", "users": 98 },
+          { "day": "Sun", "users": 84 }
+        ],
+        "options": { "x": "day", "y": "users", "fill": "#0891b2", "fillOpacity": 0.25 }
+      },
+      {
+        "type": "lineY",
+        "data": [
+          { "day": "Mon", "users": 120 },
+          { "day": "Tue", "users": 156 },
+          { "day": "Wed", "users": 142 },
+          { "day": "Thu", "users": 189 },
+          { "day": "Fri", "users": 205 },
+          { "day": "Sat", "users": 98 },
+          { "day": "Sun", "users": 84 }
+        ],
+        "options": { "x": "day", "y": "users", "stroke": "#0891b2" }
+      }
+    ],
+    "x": { "scale": "point", "label": "Day" },
+    "y": { "scale": "linear", "nice": true, "grid": true, "label": "Active Users" }
+  }
+}

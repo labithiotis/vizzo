@@ -1,0 +1,26 @@
+{
+  "name": "@vizzo/core",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "lint": "biome check .",
+    "format": "biome check --write .",
+    "test": "bun test",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@jsquash/webp": "1.5.0",
+    "@resvg/resvg-wasm": "2.6.2",
+    "@tanstack/charts": "0.14.0",
+    "@vizzo/schemas": "workspace:*",
+    "d3-scale": "4.0.2"
+  },
+  "devDependencies": {
+    "@types/d3-scale": "4.0.9"
+  }
+}

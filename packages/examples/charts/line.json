@@ -1,0 +1,20 @@
+{
+  "definition": {
+    "marks": [
+      {
+        "type": "lineY",
+        "data": [
+          { "month": "Jan", "revenue": 42000 },
+          { "month": "Feb", "revenue": 58000 },
+          { "month": "Mar", "revenue": 76000 },
+          { "month": "Apr", "revenue": 64000 },
+          { "month": "May", "revenue": 81000 },
+          { "month": "Jun", "revenue": 93000 }
+        ],
+        "options": { "x": "month", "y": "revenue", "points": true, "stroke": "#2563eb" }
+      }
+    ],
+    "x": { "scale": "point", "padding": 0.2, "label": "Month" },
+    "y": { "scale": "linear", "nice": true, "grid": true, "label": "Revenue (USD)" }
+  }
+}

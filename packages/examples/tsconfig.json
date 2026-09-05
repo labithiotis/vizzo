@@ -1,0 +1,10 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "paths": {
+      "@vizzo/core": ["../core/src/index.ts"],
+      "@vizzo/schemas": ["../schemas/src/index.ts"]
+    }
+  },
+  "include": ["src/**/*.ts"]
+}

@@ -1,0 +1,19 @@
+{
+  "definition": {
+    "marks": [
+      {
+        "type": "pie",
+        "data": [
+          { "letter": "E", "frequency": 0.12702 },
+          { "letter": "T", "frequency": 0.09056 },
+          { "letter": "A", "frequency": 0.08167 },
+          { "letter": "O", "frequency": 0.07507 },
+          { "letter": "I", "frequency": 0.06966 },
+          { "letter": "N", "frequency": 0.06749 }
+        ],
+        "options": { "value": "frequency", "color": "letter", "key": "letter", "innerRadius": 0 }
+      }
+    ],
+    "color": { "legend": { "label": "Letter" } }
+  }
+}

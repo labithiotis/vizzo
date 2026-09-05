@@ -1,0 +1,20 @@
+{
+  "definition": {
+    "marks": [
+      {
+        "type": "barY",
+        "data": [
+          { "letter": "A", "frequency": 0.08167 },
+          { "letter": "B", "frequency": 0.01492 },
+          { "letter": "E", "frequency": 0.12702 },
+          { "letter": "T", "frequency": 0.09056 },
+          { "letter": "O", "frequency": 0.07507 },
+          { "letter": "I", "frequency": 0.06966 }
+        ],
+        "options": { "x": "letter", "y": "frequency", "fill": "#16a34a" }
+      }
+    ],
+    "x": { "scale": "band", "padding": 0.12, "label": "Letter" },
+    "y": { "scale": "linear", "nice": true, "grid": true, "label": "Frequency" }
+  }
+}

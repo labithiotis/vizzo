@@ -1,0 +1,34 @@
+{
+  "definition": {
+    "marks": [
+      {
+        "type": "lineY",
+        "data": [
+          { "week": "W1", "downloads": 120, "package": "core" },
+          { "week": "W2", "downloads": 180, "package": "core" },
+          { "week": "W3", "downloads": 260, "package": "core" },
+          { "week": "W4", "downloads": 310, "package": "core" },
+          { "week": "W1", "downloads": 60, "package": "cli" },
+          { "week": "W2", "downloads": 95, "package": "cli" },
+          { "week": "W3", "downloads": 140, "package": "cli" },
+          { "week": "W4", "downloads": 205, "package": "cli" },
+          { "week": "W1", "downloads": 20, "package": "schemas" },
+          { "week": "W2", "downloads": 28, "package": "schemas" },
+          { "week": "W3", "downloads": 45, "package": "schemas" },
+          { "week": "W4", "downloads": 70, "package": "schemas" }
+        ],
+        "options": {
+          "x": "week",
+          "y": "downloads",
+          "z": "package",
+          "color": "package",
+          "strokeWidth": 2.5,
+          "points": true
+        }
+      }
+    ],
+    "x": { "scale": "point", "label": "Week" },
+    "y": { "scale": "linear", "nice": true, "grid": true, "label": "Downloads" },
+    "color": { "legend": { "label": "Package" } }
+  }
+}

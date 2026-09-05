@@ -1,0 +1,55 @@
+{
+  "name": "vizzo",
+  "version": "0.1.0",
+  "description": "Render Charts to SVG, PNG, and WebP. No browser, no Playwright, no Canvas.",
+  "type": "module",
+  "license": "MIT",
+  "author": "Labithiotis",
+  "keywords": [
+    "vizzo",
+    "cli",
+    "charts",
+    "tanstack",
+    "svg",
+    "png",
+    "webp",
+    "render",
+    "og-image",
+    "social-card",
+    "agents",
+    "visx",
+    "vizx"
+  ],
+  "homepage": "https://vizzo.dev",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vizzo/vizzo.git",
+    "directory": "packages/cli"
+  },
+  "bin": {
+    "vizzo": "./dist/cli.js"
+  },
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "files": [
+    "dist",
+    "LLM.md"
+  ],
+  "engines": {
+    "node": ">=20.6.0"
+  },
+  "scripts": {
+    "build": "bun build ./src/cli.ts --target=node --outfile=dist/cli.js && bun build ./src/index.ts --target=node --outfile=dist/index.js",
+    "lint": "biome check .",
+    "format": "biome check --write .",
+    "test": "bun test",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@jsquash/webp": "1.5.0",
+    "@resvg/resvg-wasm": "2.6.2",
+    "@vizzo/core": "workspace:*",
+    "@vizzo/schemas": "workspace:*"
+  }
+}
