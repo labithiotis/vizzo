@@ -4,9 +4,7 @@ import { initWasm } from '@resvg/resvg-wasm';
 import resvgModule from '@resvg/resvg-wasm/index_bg.wasm';
 import fontDataUrl from '../fonts/Roboto-Regular.ttf?inline';
 
-const fontBuffer = Uint8Array.from(atob(fontDataUrl.slice(fontDataUrl.indexOf(',') + 1)), (character) =>
-  character.charCodeAt(0),
-);
+let fontBuffer: Uint8Array | undefined;
 
 let resvgReady: Promise<void> | undefined;
 export function ensureResvg() {
@@ -22,5 +20,8 @@ export function ensureWebp() {
 
 export function loadFont(path: string | undefined) {
   if (path) throw new Error('Custom font paths are unavailable in Cloudflare Workers.');
+  fontBuffer ??= Uint8Array.from(atob(fontDataUrl.slice(fontDataUrl.indexOf(',') + 1)), (character) =>
+    character.charCodeAt(0),
+  );
   return Promise.resolve(fontBuffer);
 }
