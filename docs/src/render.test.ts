@@ -105,6 +105,7 @@ describe('POST /', () => {
     const response = await renderRequest(request({ definition }), { limit: async () => ({ success: false }) });
     expect(response.status).toBe(429);
     expect(response.headers.get('Retry-After')).toBe('60');
+    expect(response.headers.get('Access-Control-Expose-Headers')).toBe('Retry-After');
     expect(response.headers.get('Access-Control-Allow-Origin')).toBe('*');
   });
 

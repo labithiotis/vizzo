@@ -4,7 +4,7 @@ import { renderOptionsSchema } from '@vizzo/schemas';
 const MAX_BODY_BYTES = 1024 * 1024;
 const MAX_DIMENSION = 2000;
 const MAX_DATA_ROWS = 10_000;
-const CORS_HEADERS = { 'Access-Control-Allow-Origin': '*' };
+const CORS_HEADERS = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Expose-Headers': 'Retry-After' };
 
 const apiOptionsSchema = renderOptionsSchema
   .extend({
