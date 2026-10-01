@@ -45,7 +45,6 @@ The API uses the existing Vizzo Zod schema with these public limits:
 - At most 1 MiB of JSON, measured in bytes.
 - At most 10,000 data rows across all marks.
 - At most 10 POST requests per minute per IP, including invalid requests.
-- At most 1,000 ms CPU per Worker invocation when deployed.
 
 Cloudflare's rate limiter uses approximate counters local to each Cloudflare
 location. Clients sharing an IP share an allowance. This is a throttle, not an
