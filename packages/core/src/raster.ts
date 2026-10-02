@@ -18,13 +18,18 @@ async function loadWasm(module: WebAssembly.Module | string): Promise<WebAssembl
 
 function loadFont(path: string | undefined) {
   const key = path ?? '';
-  const pending =
-    fontCache.get(key) ??
-    (!path && fontSource.startsWith('data:')
+  const cached = fontCache.get(key);
+  if (cached) return cached;
+  const pending = (
+    !path && fontSource.startsWith('data:')
       ? Promise.resolve(
           Uint8Array.from(atob(fontSource.slice(fontSource.indexOf(',') + 1)), (character) => character.charCodeAt(0)),
         )
-      : readFile(path ?? new URL(fontSource, import.meta.url)));
+      : readFile(path ?? new URL(fontSource, import.meta.url))
+  ).catch((error) => {
+    if (fontCache.get(key) === pending) fontCache.delete(key);
+    throw error;
+  });
   fontCache.set(key, pending);
   return pending;
 }
@@ -46,7 +51,12 @@ function inlineCssVariables(svg: string): string {
 }
 
 async function rasterize(svg: string, options: RasterOptions) {
-  resvgReady ??= loadWasm(resvgModule).then(initWasm);
+  resvgReady ??= loadWasm(resvgModule)
+    .then(initWasm)
+    .catch((error) => {
+      resvgReady = undefined;
+      throw error;
+    });
   const [, fontBuffer] = await Promise.all([resvgReady, loadFont(options.font)]);
   const resvg = new Resvg(inlineCssVariables(svg), {
     ...(options.background ? { background: options.background } : {}),
@@ -69,7 +79,12 @@ export async function svgToPng(svg: string, options: RasterOptions = {}): Promis
 }
 
 export async function svgToWebp(svg: string, options: RasterOptions = {}): Promise<Uint8Array> {
-  webpReady ??= loadWasm(webpModule).then((module) => initWebp(module));
+  webpReady ??= loadWasm(webpModule)
+    .then((module) => initWebp(module))
+    .catch((error) => {
+      webpReady = undefined;
+      throw error;
+    });
   await webpReady;
   const rendered = await rasterize(svg, options);
   try {

@@ -2,7 +2,7 @@
   "$schema": "https://turbo.build/schema.json",
   "tasks": {
     "build": {
-      "inputs": ["src/**", "*.json"],
+      "dependsOn": ["^build"],
       "outputs": ["dist/**", ".output/**"]
     },
     "lint": {
