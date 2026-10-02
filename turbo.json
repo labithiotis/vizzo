@@ -3,7 +3,7 @@
   "tasks": {
     "build": {
       "inputs": ["src/**", "*.json"],
-      "outputs": ["dist/**", "fonts/**", ".output/**"]
+      "outputs": ["dist/**", ".output/**"]
     },
     "lint": {
       "inputs": ["src/**", "biome.json", "*.json"],
