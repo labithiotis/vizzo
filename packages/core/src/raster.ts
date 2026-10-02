@@ -1,8 +1,33 @@
-import encodeWebp from '@jsquash/webp/encode';
-import { Resvg } from '@resvg/resvg-wasm';
-import { ensureResvg, ensureWebp, loadFont } from '#rasterRuntime';
+/// <reference path="./assets.d.ts" />
+import { readFile } from 'node:fs/promises';
+import webpModule from '@jsquash/webp/codec/enc/webp_enc_simd.wasm';
+import encodeWebp, { init as initWebp } from '@jsquash/webp/encode';
+import { initWasm, Resvg } from '@resvg/resvg-wasm';
+import resvgModule from '@resvg/resvg-wasm/index_bg.wasm';
+import fontSource from '../fonts/Roboto-Regular.ttf';
 
 const DEFAULT_FONT_FAMILY = 'Roboto';
+const fontCache = new Map<string, Promise<Uint8Array>>();
+let resvgReady: Promise<void> | undefined;
+let webpReady: Promise<unknown> | undefined;
+
+// Workers imports precompiled WASM modules; Bun bundles asset paths for Node.
+async function loadWasm(module: WebAssembly.Module | string): Promise<WebAssembly.Module> {
+  return typeof module === 'string' ? WebAssembly.compile(await readFile(new URL(module, import.meta.url))) : module;
+}
+
+function loadFont(path: string | undefined) {
+  const key = path ?? '';
+  const pending =
+    fontCache.get(key) ??
+    (!path && fontSource.startsWith('data:')
+      ? Promise.resolve(
+          Uint8Array.from(atob(fontSource.slice(fontSource.indexOf(',') + 1)), (character) => character.charCodeAt(0)),
+        )
+      : readFile(path ?? new URL(fontSource, import.meta.url)));
+  fontCache.set(key, pending);
+  return pending;
+}
 
 export type RasterOptions = {
   background?: string;
@@ -21,7 +46,8 @@ function inlineCssVariables(svg: string): string {
 }
 
 async function rasterize(svg: string, options: RasterOptions) {
-  const [, fontBuffer] = await Promise.all([ensureResvg(), loadFont(options.font)]);
+  resvgReady ??= loadWasm(resvgModule).then(initWasm);
+  const [, fontBuffer] = await Promise.all([resvgReady, loadFont(options.font)]);
   const resvg = new Resvg(inlineCssVariables(svg), {
     ...(options.background ? { background: options.background } : {}),
     font: { fontBuffers: [fontBuffer], defaultFontFamily: DEFAULT_FONT_FAMILY },
@@ -43,7 +69,8 @@ export async function svgToPng(svg: string, options: RasterOptions = {}): Promis
 }
 
 export async function svgToWebp(svg: string, options: RasterOptions = {}): Promise<Uint8Array> {
-  await ensureWebp();
+  webpReady ??= loadWasm(webpModule).then((module) => initWebp(module));
+  await webpReady;
   const rendered = await rasterize(svg, options);
   try {
     const imageData = {

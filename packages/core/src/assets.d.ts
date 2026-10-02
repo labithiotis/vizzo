@@ -1,9 +1,9 @@
 declare module '*.wasm' {
-  const module: WebAssembly.Module;
+  const module: WebAssembly.Module | string;
   export default module;
 }
 
-declare module '*.ttf?inline' {
-  const dataUrl: string;
-  export default dataUrl;
+declare module '*.ttf' {
+  const source: string;
+  export default source;
 }

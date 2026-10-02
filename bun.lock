@@ -41,10 +41,6 @@
       "bin": {
         "vizzo": "./dist/cli.js",
       },
-      "dependencies": {
-        "@jsquash/webp": "1.5.0",
-        "@resvg/resvg-wasm": "2.6.2",
-      },
       "devDependencies": {
         "@vizzo/core": "workspace:*",
         "@vizzo/schemas": "workspace:*",
