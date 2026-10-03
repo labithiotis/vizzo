@@ -1,47 +1,34 @@
+/// <reference path="./assets.d.ts" />
+import { Buffer } from 'node:buffer';
 import { readFile } from 'node:fs/promises';
-import { fileURLToPath } from 'node:url';
-import { default as encodeWebp, init as initWebp } from '@jsquash/webp/encode';
+import webpModule from '@jsquash/webp/codec/enc/webp_enc_simd.wasm';
+import encodeWebp, { init as initWebp } from '@jsquash/webp/encode';
 import { initWasm, Resvg } from '@resvg/resvg-wasm';
+import resvgModule from '@resvg/resvg-wasm/index_bg.wasm';
+import fontSource from '../fonts/Roboto-Regular.ttf';
 
-/**
- * Both resvg and the WebP encoder ship as raw .wasm files loaded through
- * bundler-specific magic upstream (fetch() against import.meta.url). That
- * breaks under plain Node, whose fetch() rejects file:// URLs. Reading the
- * bytes ourselves via import.meta.resolve works under Bun, Node, and inside
- * a bundled CLI build.
- */
-async function readWasmBinary(specifier: string) {
-  return readFile(fileURLToPath(import.meta.resolve(specifier)));
-}
-
-let resvgReady: Promise<void> | undefined;
-function ensureResvg() {
-  resvgReady ??= readWasmBinary('@resvg/resvg-wasm/index_bg.wasm').then(initWasm);
-  return resvgReady;
-}
-
-let webpReady: Promise<unknown> | undefined;
-function ensureWebp() {
-  webpReady ??= readWasmBinary('@jsquash/webp/codec/enc/webp_enc_simd.wasm').then((wasmBinary) =>
-    initWebp({ wasmBinary }),
-  );
-  return webpReady;
-}
-
-/**
- * resvg-wasm cannot see the host's font directories, so an unstyled render
- * drops every <text> node. We ship Roboto next to the bundle and hand resvg
- * the bytes; `fonts/` sits one level up from both `src/` and the built
- * `dist/`, so the same relative URL resolves in the workspace and in the
- * published package.
- */
 const DEFAULT_FONT_FAMILY = 'Roboto';
-const DEFAULT_FONT_URL = new URL('../fonts/Roboto-Regular.ttf', import.meta.url);
-
 const fontCache = new Map<string, Promise<Uint8Array>>();
+let resvgReady: Promise<void> | undefined;
+let webpReady: Promise<unknown> | undefined;
+
+// Workers imports precompiled WASM modules; Bun bundles asset paths for Node.
+async function loadWasm(module: WebAssembly.Module | string): Promise<WebAssembly.Module> {
+  return typeof module === 'string' ? WebAssembly.compile(await readFile(new URL(module, import.meta.url))) : module;
+}
+
 function loadFont(path: string | undefined) {
   const key = path ?? '';
-  const pending = fontCache.get(key) ?? readFile(path ?? DEFAULT_FONT_URL);
+  const cached = fontCache.get(key);
+  if (cached) return cached;
+  const pending = (
+    !path && fontSource.startsWith('data:')
+      ? Promise.resolve(Buffer.from(fontSource.slice(fontSource.indexOf(',') + 1), 'base64'))
+      : readFile(path ?? new URL(fontSource, import.meta.url))
+  ).catch((error) => {
+    if (fontCache.get(key) === pending) fontCache.delete(key);
+    throw error;
+  });
   fontCache.set(key, pending);
   return pending;
 }
@@ -63,26 +50,51 @@ function inlineCssVariables(svg: string): string {
 }
 
 async function rasterize(svg: string, options: RasterOptions) {
-  const [, fontBuffer] = await Promise.all([ensureResvg(), loadFont(options.font)]);
+  resvgReady ??= loadWasm(resvgModule)
+    .then(initWasm)
+    .catch((error) => {
+      resvgReady = undefined;
+      throw error;
+    });
+  const [, fontBuffer] = await Promise.all([resvgReady, loadFont(options.font)]);
   const resvg = new Resvg(inlineCssVariables(svg), {
     ...(options.background ? { background: options.background } : {}),
     font: { fontBuffers: [fontBuffer], defaultFontFamily: DEFAULT_FONT_FAMILY },
   });
-  return resvg.render();
+  try {
+    return resvg.render();
+  } finally {
+    resvg.free();
+  }
 }
 
 export async function svgToPng(svg: string, options: RasterOptions = {}): Promise<Uint8Array> {
-  return (await rasterize(svg, options)).asPng();
+  const rendered = await rasterize(svg, options);
+  try {
+    return rendered.asPng();
+  } finally {
+    rendered.free();
+  }
 }
 
 export async function svgToWebp(svg: string, options: RasterOptions = {}): Promise<Uint8Array> {
-  await ensureWebp();
+  webpReady ??= loadWasm(webpModule)
+    .then((module) => initWebp(module))
+    .catch((error) => {
+      webpReady = undefined;
+      throw error;
+    });
+  await webpReady;
   const rendered = await rasterize(svg, options);
-  const imageData = {
-    data: rendered.pixels,
-    width: rendered.width,
-    height: rendered.height,
-  } as unknown as ImageData;
-  const encoded = await encodeWebp(imageData);
-  return new Uint8Array(encoded);
+  try {
+    const imageData = {
+      data: new Uint8ClampedArray(rendered.pixels),
+      width: rendered.width,
+      height: rendered.height,
+      colorSpace: 'srgb',
+    } satisfies ImageData;
+    return new Uint8Array(await encodeWebp(imageData));
+  } finally {
+    rendered.free();
+  }
 }

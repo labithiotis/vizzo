@@ -13,6 +13,5 @@ coverage/
 *.log
 .DS_Store
 .turbo/
-packages/cli/fonts/
 packages/e2e/.diffs/
 .worktrees/
