@@ -1,4 +1,5 @@
 /// <reference path="./assets.d.ts" />
+import { Buffer } from 'node:buffer';
 import { readFile } from 'node:fs/promises';
 import webpModule from '@jsquash/webp/codec/enc/webp_enc_simd.wasm';
 import encodeWebp, { init as initWebp } from '@jsquash/webp/encode';
@@ -22,9 +23,7 @@ function loadFont(path: string | undefined) {
   if (cached) return cached;
   const pending = (
     !path && fontSource.startsWith('data:')
-      ? Promise.resolve(
-          Uint8Array.from(atob(fontSource.slice(fontSource.indexOf(',') + 1)), (character) => character.charCodeAt(0)),
-        )
+      ? Promise.resolve(Buffer.from(fontSource.slice(fontSource.indexOf(',') + 1), 'base64'))
       : readFile(path ?? new URL(fontSource, import.meta.url))
   ).catch((error) => {
     if (fontCache.get(key) === pending) fontCache.delete(key);
