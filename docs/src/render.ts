@@ -44,6 +44,41 @@ async function readBody(request: Request) {
   }
 }
 
+function queryOptions(input: unknown, query: URLSearchParams) {
+  if (typeof input !== 'object' || input === null || Array.isArray(input)) return input;
+  const overrides: Record<string, string | number> = Object.fromEntries(query);
+  delete overrides.data;
+  for (const key of ['width', 'height']) {
+    if (key in overrides) overrides[key] = Number(overrides[key]);
+  }
+  return { ...input, ...overrides };
+}
+
+async function readInput(request: Request): Promise<unknown> {
+  if (request.method === 'GET') {
+    const query = new URL(request.url).searchParams;
+    const data = query.get('data') ?? '';
+    if (new TextEncoder().encode(data).byteLength > MAX_BODY_BYTES) {
+      return errorResponse('Request data must not exceed 1 MiB.', 413);
+    }
+    try {
+      return queryOptions(JSON.parse(data), query);
+    } catch {
+      return errorResponse('Request data must be valid JSON.', 400);
+    }
+  }
+  if (request.headers.get('Content-Type')?.split(';')[0]?.trim().toLowerCase() !== 'application/json') {
+    return errorResponse('Content-Type must be application/json.', 415);
+  }
+  const body = await readBody(request);
+  if (body === null) return errorResponse('Request body must not exceed 1 MiB.', 413);
+  try {
+    return JSON.parse(body);
+  } catch {
+    return errorResponse('Request body must be valid JSON.', 400);
+  }
+}
+
 export async function renderRequest(request: Request, limiter: RateLimit): Promise<Response> {
   if (request.method === 'OPTIONS') {
     return new Response(null, {
@@ -59,17 +94,8 @@ export async function renderRequest(request: Request, limiter: RateLimit): Promi
   try {
     const { success } = await limiter.limit({ key: request.headers.get('CF-Connecting-IP') ?? 'unknown' });
     if (!success) return errorResponse('Rate limit exceeded. Try again in 60 seconds.', 429, { 'Retry-After': '60' });
-    if (request.headers.get('Content-Type')?.split(';')[0]?.trim().toLowerCase() !== 'application/json') {
-      return errorResponse('Content-Type must be application/json.', 415);
-    }
-    const body = await readBody(request);
-    if (body === null) return errorResponse('Request body must not exceed 1 MiB.', 413);
-    let input: unknown;
-    try {
-      input = JSON.parse(body);
-    } catch {
-      return errorResponse('Request body must be valid JSON.', 400);
-    }
+    const input = await readInput(request);
+    if (input instanceof Response) return input;
     const options = apiOptionsSchema.safeParse(input);
     if (!options.success) {
       return Response.json(
@@ -83,6 +109,7 @@ export async function renderRequest(request: Request, limiter: RateLimit): Promi
         ...CORS_HEADERS,
         'Content-Type': result.format === 'svg' ? 'image/svg+xml' : `image/${result.format}`,
         'Cache-Control': 'no-store',
+        'Content-Security-Policy': "default-src 'none'; style-src 'unsafe-inline'; sandbox",
         'X-Content-Type-Options': 'nosniff',
       },
     });
