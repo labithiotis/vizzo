@@ -1,4 +1,7 @@
 import { describe, expect, test } from 'bun:test';
+import { copyFile, mkdtemp, rm } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { svgToPng } from './raster.ts';
 
@@ -20,6 +23,19 @@ describe('svgToPng', () => {
 
   test('fails loudly when the supplied font path does not exist', async () => {
     expect(svgToPng(TEXT_SVG, { font: '/no/such/font.ttf' })).rejects.toThrow();
+  });
+
+  test('retries a failed font load after the file becomes available', async () => {
+    const directory = await mkdtemp(join(tmpdir(), 'vizzo-font-retry-'));
+    const font = join(directory, 'Roboto-Regular.ttf');
+    try {
+      await expect(svgToPng(TEXT_SVG, { font })).rejects.toThrow();
+      await copyFile(new URL('../fonts/Roboto-Regular.ttf', import.meta.url), font);
+      const [retried, bundled] = await Promise.all([svgToPng(TEXT_SVG, { font }), svgToPng(TEXT_SVG)]);
+      expect(Buffer.compare(Buffer.from(retried), Buffer.from(bundled))).toBe(0);
+    } finally {
+      await rm(directory, { recursive: true, force: true });
+    }
   });
 
   /** resvg has no CSS engine: an unresolved var() turns fills black and drops strokes entirely. */

@@ -27,8 +27,8 @@ requires a browser, Playwright, or Canvas at render time.
   GitHub Action or a Discord bot without a warmup step.
 - `packages/core/fonts/Roboto-Regular.ttf` is vendored because resvg-wasm
   cannot read the host's font directories; without it every `<text>` node is
-  dropped from PNG and WebP. `packages/cli`'s build copies it to
-  `packages/cli/fonts` (generated, git-ignored, published).
+  dropped from PNG and WebP. The CLI build bundles the font and WASM files into
+  `packages/cli/dist`; the Worker build inlines the font.
 - The published `vizzo` package must work under plain Node, not just Bun.
   Anything it does at runtime (loading the resvg/webp `.wasm` files, in
   particular) has to survive `bun build --target=node` and execution with

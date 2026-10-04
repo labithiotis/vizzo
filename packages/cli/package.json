@@ -34,22 +34,17 @@
   },
   "files": [
     "dist",
-    "fonts",
     "LLM.md"
   ],
   "engines": {
     "node": ">=20.6.0"
   },
   "scripts": {
-    "build": "bun build ./src/cli.ts --target=node --outfile=dist/cli.js && bun build ./src/index.ts --target=node --outfile=dist/index.js && rm -rf fonts && cp -R ../core/fonts fonts",
+    "build": "bun build ./src/cli.ts ./src/index.ts --target=node --outdir=dist && cp ../core/fonts/LICENSE dist/FONT_LICENSE",
     "lint": "biome check .",
     "format": "biome check --write .",
     "test": "bun test",
     "typecheck": "tsc --noEmit"
-  },
-  "dependencies": {
-    "@jsquash/webp": "1.5.0",
-    "@resvg/resvg-wasm": "2.6.2"
   },
   "devDependencies": {
     "@vizzo/core": "workspace:*",

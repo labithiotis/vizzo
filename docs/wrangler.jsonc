@@ -10,5 +10,6 @@
   },
   "observability": {
     "enabled": true
-  }
+  },
+  "ratelimits": [{ "name": "RENDER_RATE_LIMIT", "namespace_id": "1001", "simple": { "limit": 10, "period": 60 } }]
 }

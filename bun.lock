@@ -18,6 +18,8 @@
       "dependencies": {
         "@tanstack/react-router": "1.170.32",
         "@tanstack/react-start": "1.168.49",
+        "@vizzo/core": "workspace:*",
+        "@vizzo/schemas": "workspace:*",
         "react": "19.2.8",
         "react-dom": "19.2.8",
       },
@@ -35,13 +37,9 @@
     },
     "packages/cli": {
       "name": "vizzo",
-      "version": "0.1.0",
+      "version": "0.2.1",
       "bin": {
         "vizzo": "./dist/cli.js",
-      },
-      "dependencies": {
-        "@jsquash/webp": "1.5.0",
-        "@resvg/resvg-wasm": "2.6.2",
       },
       "devDependencies": {
         "@vizzo/core": "workspace:*",
