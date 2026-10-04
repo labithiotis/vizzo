@@ -55,7 +55,7 @@ function queryOptions(input: unknown, query: URLSearchParams) {
 }
 
 async function readInput(request: Request): Promise<unknown> {
-  if (request.method === 'GET') {
+  if (request.method === 'GET' || request.method === 'HEAD') {
     const query = new URL(request.url).searchParams;
     const data = query.get('data') ?? '';
     if (new TextEncoder().encode(data).byteLength > MAX_BODY_BYTES) {

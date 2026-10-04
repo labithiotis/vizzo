@@ -125,6 +125,16 @@ describe('POST /', () => {
 });
 
 describe('GET /x', () => {
+  test('parses query options for the TanStack HEAD fallback', async () => {
+    const head = new Request(queryRequest({ definition }, { width: '200', height: '120', format: 'svg' }), {
+      method: 'HEAD',
+    });
+    const response = await renderRequest(head, allowedLimiter());
+    expect(response.status).toBe(200);
+    expect(response.headers.get('Content-Type')).toBe('image/svg+xml');
+    expect(await response.text()).toContain('viewBox="0 0 200 120"');
+  });
+
   test('defaults to the same PNG as POST without a content type', async () => {
     const limiter = allowedLimiter();
     const response = await renderRequest(queryRequest({ definition }), limiter);

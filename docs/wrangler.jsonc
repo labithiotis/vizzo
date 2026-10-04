@@ -1,7 +1,7 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "vizzo",
-  "main": "src/server.ts",
+  "main": "@tanstack/react-start/server-entry",
   "compatibility_date": "2026-08-13",
   "compatibility_flags": ["nodejs_compat"],
   "assets": {
