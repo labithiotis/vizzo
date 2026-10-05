@@ -63,6 +63,7 @@ Send `GET https://vizzo.dev/x?width=200&data=<URL-encoded JSON>`. The required
 `definition`. Optional `width`, `height`, `format`, `theme`, `preset`, and
 `background` query parameters override values in that JSON. PNG is the default.
 Unknown query parameters are rejected.
+Query values use TanStack's JSON-first parsing; repeated scalar parameters are rejected.
 
 ```sh
 curl --get https://vizzo.dev/x \

@@ -71,6 +71,7 @@ describe('POST /', () => {
     { definition, width: 2001 },
     { definition, height: 2001 },
     { definition, width: 0 },
+    { definition, width: '200' },
     { definition, format: 'jpeg' },
     { definition, font: '/tmp/font.ttf' },
   ])('rejects invalid render options: %j', async (body) => {
@@ -162,6 +163,44 @@ describe('GET /x', () => {
     expect(new Uint8Array(await response.arrayBuffer())).toEqual(new Uint8Array(bytes));
   });
 
+  test('applies query overrides before validating JSON options', async () => {
+    const response = await renderRequest(
+      queryRequest(
+        { definition, width: 'invalid', height: -1, format: 'jpeg' },
+        { width: '200', height: '120', format: 'svg' },
+      ),
+      allowedLimiter(),
+    );
+    expect(response.status).toBe(200);
+    expect(await response.text()).toContain('viewBox="0 0 200 120"');
+  });
+
+  test('preserves JSON options when query overrides are omitted', async () => {
+    const response = await renderRequest(
+      queryRequest({ definition, width: 200, height: 120, format: 'svg' }),
+      allowedLimiter(),
+    );
+    expect(response.status).toBe(200);
+    expect(response.headers.get('Content-Type')).toBe('image/svg+xml');
+    expect(await response.text()).toContain('viewBox="0 0 200 120"');
+  });
+
+  test.each(['width', 'height'])('GET and POST report the same %s limit errors', async (dimension) => {
+    const post = await renderRequest(request({ definition, [dimension]: 2001 }), allowedLimiter());
+    const get = await renderRequest(queryRequest({ definition }, { [dimension]: '2001' }), allowedLimiter());
+    expect(post.status).toBe(400);
+    expect(get.status).toBe(400);
+    expect(await get.json()).toEqual(await post.json());
+  });
+
+  test.each(['width', 'data'])('rejects repeated scalar query parameters: %s', async (parameter) => {
+    const url = new URL(queryRequest({ definition }, { width: '200' }).url);
+    url.searchParams.append(parameter, url.searchParams.get(parameter) ?? '');
+    const response = await renderRequest(new Request(url), allowedLimiter());
+    expect(response.status).toBe(400);
+    expect(await response.json()).toHaveProperty('issues');
+  });
+
   test('accepts presets in query parameters', async () => {
     const response = await renderRequest(
       queryRequest({ definition }, { preset: 'og', format: 'svg' }),
@@ -181,6 +220,7 @@ describe('GET /x', () => {
     { width: 'Infinity' },
     { format: 'jpeg' },
     { font: '/tmp/font.ttf' },
+    { definition: JSON.stringify(definition) },
   ];
   test.each(invalidQueryOptions)('validates query options: %j', async (options) => {
     const response = await renderRequest(queryRequest({ definition }, options), allowedLimiter());
@@ -196,7 +236,7 @@ describe('GET /x', () => {
   test('requires the data parameter', async () => {
     const response = await renderRequest(new Request('https://vizzo.dev/x?width=200'), allowedLimiter());
     expect(response.status).toBe(400);
-    expect(await response.json()).toHaveProperty('error', 'Request data must be valid JSON.');
+    expect(await response.json()).toHaveProperty('issues');
   });
 
   test('bounds decoded data by UTF-8 bytes', async () => {
@@ -204,6 +244,13 @@ describe('GET /x', () => {
       queryRequest({ definition, background: '€'.repeat(Math.ceil((1024 * 1024) / 3)) }),
       allowedLimiter(),
     );
+    expect(response.status).toBe(413);
+  });
+
+  test('bounds all decoded data before parsing repeated query parameters', async () => {
+    const url = new URL(queryRequest({ definition }).url);
+    url.searchParams.append('data', '€'.repeat(Math.ceil((1024 * 1024) / 3)));
+    const response = await renderRequest(new Request(url), allowedLimiter());
     expect(response.status).toBe(413);
   });
 

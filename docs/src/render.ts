@@ -1,5 +1,7 @@
+import { defaultParseSearch } from '@tanstack/react-router';
 import { render } from '@vizzo/core';
 import { renderOptionsSchema } from '@vizzo/schemas';
+import { z } from 'zod';
 
 const MAX_BODY_BYTES = 1024 * 1024;
 const MAX_DIMENSION = 2000;
@@ -17,6 +19,13 @@ const apiOptionsSchema = renderOptionsSchema
     path: ['definition', 'marks'],
     message: `Charts may contain at most ${MAX_DATA_ROWS} total data rows.`,
   });
+
+const apiQuerySchema = renderOptionsSchema
+  .omit({ definition: true })
+  .extend({ data: z.record(z.string(), z.unknown()) })
+  .strict()
+  .transform(({ data, ...overrides }) => ({ ...data, ...overrides }))
+  .pipe(apiOptionsSchema);
 
 function errorResponse(error: string, status: number, headers: Record<string, string> = {}) {
   return Response.json({ error }, { status, headers: { ...CORS_HEADERS, ...headers } });
@@ -44,28 +53,14 @@ async function readBody(request: Request) {
   }
 }
 
-function queryOptions(input: unknown, query: URLSearchParams) {
-  if (typeof input !== 'object' || input === null || Array.isArray(input)) return input;
-  const overrides: Record<string, string | number> = Object.fromEntries(query);
-  delete overrides.data;
-  for (const key of ['width', 'height']) {
-    if (key in overrides) overrides[key] = Number(overrides[key]);
-  }
-  return { ...input, ...overrides };
-}
-
-async function readInput(request: Request): Promise<unknown> {
+async function readOptions(request: Request) {
   if (request.method === 'GET' || request.method === 'HEAD') {
-    const query = new URL(request.url).searchParams;
-    const data = query.get('data') ?? '';
+    const url = new URL(request.url);
+    const data = url.searchParams.getAll('data').join('');
     if (new TextEncoder().encode(data).byteLength > MAX_BODY_BYTES) {
       return errorResponse('Request data must not exceed 1 MiB.', 413);
     }
-    try {
-      return queryOptions(JSON.parse(data), query);
-    } catch {
-      return errorResponse('Request data must be valid JSON.', 400);
-    }
+    return apiQuerySchema.safeParse(defaultParseSearch(url.search));
   }
   if (request.headers.get('Content-Type')?.split(';')[0]?.trim().toLowerCase() !== 'application/json') {
     return errorResponse('Content-Type must be application/json.', 415);
@@ -73,7 +68,7 @@ async function readInput(request: Request): Promise<unknown> {
   const body = await readBody(request);
   if (body === null) return errorResponse('Request body must not exceed 1 MiB.', 413);
   try {
-    return JSON.parse(body);
+    return apiOptionsSchema.safeParse(JSON.parse(body));
   } catch {
     return errorResponse('Request body must be valid JSON.', 400);
   }
@@ -94,9 +89,8 @@ export async function renderRequest(request: Request, limiter: RateLimit): Promi
   try {
     const { success } = await limiter.limit({ key: request.headers.get('CF-Connecting-IP') ?? 'unknown' });
     if (!success) return errorResponse('Rate limit exceeded. Try again in 60 seconds.', 429, { 'Retry-After': '60' });
-    const input = await readInput(request);
-    if (input instanceof Response) return input;
-    const options = apiOptionsSchema.safeParse(input);
+    const options = await readOptions(request);
+    if (options instanceof Response) return options;
     if (!options.success) {
       return Response.json(
         { error: 'Invalid render options.', issues: options.error.issues },
