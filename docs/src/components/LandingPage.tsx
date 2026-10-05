@@ -1,7 +1,6 @@
 import { Link } from '@tanstack/react-router';
 import { useEffect, useRef } from 'react';
 import { ExampleGallery } from './ExampleGallery';
-import { FeatureList } from './FeatureList';
 import { HomeHero } from './HomeHero';
 
 export function LandingPage() {
@@ -84,17 +83,6 @@ export function LandingPage() {
     <main ref={root}>
       <HomeHero />
       <section className="mx-auto max-w-6xl border-grid p-6 dark:border-grid-dark">
-        <h2
-          data-reveal
-          className="font-mono-display text-ink/50 text-xs uppercase tracking-widest dark:text-ink-dark/50"
-        >
-          What you get
-        </h2>
-        <div className="mt-6 max-w-3xl">
-          <FeatureList />
-        </div>
-      </section>
-      <section className="mx-auto max-w-6xl border-grid p-6 dark:border-grid-dark">
         <div data-reveal className="flex flex-wrap items-center justify-between gap-4">
           <h2 className="font-mono-display text-ink/50 text-xs uppercase tracking-widest dark:text-ink-dark/50">
             Examples
@@ -111,7 +99,7 @@ export function LandingPage() {
           </Link>
         </div>
         <p data-reveal data-reveal-delay="70" className="mt-3 text-ink/60 text-sm dark:text-ink-dark/60">
-          Every chart on this site is rendered by the Vizzo API.
+          Every chart image on this site is rendered by the Vizzo API.
         </p>
         <div className="mt-6">
           <ExampleGallery />

@@ -145,8 +145,7 @@
 
 .landing-control,
 .landing-card,
-.landing-arrow,
-.landing-feature-icon {
+.landing-arrow {
   transition: transform var(--motion-quick) var(--ease-out);
 }
 
@@ -171,10 +170,6 @@
     .landing-control:hover .landing-arrow,
     .landing-card:hover .landing-arrow {
       transform: translateX(3px);
-    }
-
-    .landing-card:hover .landing-feature-icon {
-      transform: rotate(-5deg) scale(1.05);
     }
   }
 }
@@ -204,8 +199,7 @@
 
   .landing-control,
   .landing-card,
-  .landing-arrow,
-  .landing-feature-icon {
+  .landing-arrow {
     transition: none;
     transform: none;
   }

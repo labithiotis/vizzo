@@ -4,7 +4,7 @@ Lines, bars, layered areas, multiple series, dates, and proportions. Every image
 
 ## Start from a working definition
 
-Every chart on this site is rendered by the Vizzo API. Previews use live image URLs with an explicit theme and follow your device's light or dark preference. GET images are cached for 30 days; cache hits do not consume your render allowance. Copy the JSURL2 URL and change values in the address bar, or download the JSON to render it locally.
+Every chart image on this site is rendered by the Vizzo API. Previews use live image URLs with an explicit theme and follow your device's light or dark preference. GET images are cached for 30 days; cache hits do not consume your render allowance. Copy the JSURL2 URL and change values in the address bar, or download the JSON to render it locally.
 
 Use PNG for broad attachment support, WebP for smaller files when your destination accepts it, and SVG when you need scalable vector output. The renderer does not publish or send anything for you.
 
