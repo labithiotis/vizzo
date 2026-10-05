@@ -5,16 +5,18 @@
   "type": "module",
   "license": "MIT",
   "scripts": {
-    "build": "vite build",
+    "build": "bun run generate && vite build",
     "build:types": "wrangler types",
-    "dev": "vite dev --host",
+    "dev": "bun run generate && vite dev --host",
     "deploy": "bun run build && wrangler deploy",
     "lint": "biome check .",
     "format": "biome check --write .",
     "test": "bun test",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "generate": "bun scripts/generateDocs.ts && biome format --write public/schema.json"
   },
   "dependencies": {
+    "@tanstack/markdown": "1.0.0",
     "@tanstack/react-router": "1.170.32",
     "@tanstack/react-start": "1.168.49",
     "@vizzo/core": "workspace:*",

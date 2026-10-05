@@ -1,0 +1,596 @@
+# Vizzo documentation
+
+
+
+# Make a chart. Send an image.
+
+Source: https://vizzo.dev/docs/index.md
+
+Turn a TanStack Charts definition into an image with a URL, the CLI, or a POST request.
+
+## An image, wherever the conversation happens
+
+Send a revenue chart to Slack. Attach a release report in Discord. Put a weekly trend in an email or a PNG in a tweet. Vizzo renders the file from your chart definition, without launching a browser.
+
+Start with a [working chart URL](https://vizzo.dev/x?width=960&height=540&theme=light&data=(definition~(marks~!(type~lineY~data~!(month~Jan~revenue~42000)(month~Feb~revenue~58000)(month~Mar~revenue~76000)(month~Apr~revenue~64000)(month~May~revenue~81000)(month~Jun~revenue~93000)~options~(x~month~y~revenue~points~~stroke~**H2563eb))~x~(scale~point~padding~0.2~label~Month)y~(scale~linear~nice~~grid~~label~Revenue_*CUSD*D))theme~light)~). It returns a PNG. Change `width=960` to `width=1200`, or change `theme=light` to `theme=dark` in the address bar. The `data` parameter uses JSURL2, a compact encoding of the same JSON accepted by the CLI.
+
+## Save a chart definition
+
+Download [line.json](/docs/examples/line.json), or save this envelope as `line.json`. A definition contains TanStack Charts marks and scales. Each mark names the factory function, its data, and its options.
+
+```json
+{
+  "definition": {
+    "marks": [
+      {
+        "type": "lineY",
+        "data": [
+          {
+            "month": "Jan",
+            "revenue": 42000
+          },
+          {
+            "month": "Feb",
+            "revenue": 58000
+          },
+          {
+            "month": "Mar",
+            "revenue": 76000
+          },
+          {
+            "month": "Apr",
+            "revenue": 64000
+          },
+          {
+            "month": "May",
+            "revenue": 81000
+          },
+          {
+            "month": "Jun",
+            "revenue": 93000
+          }
+        ],
+        "options": {
+          "x": "month",
+          "y": "revenue",
+          "points": true,
+          "stroke": "#2563eb"
+        }
+      }
+    ],
+    "x": {
+      "scale": "point",
+      "padding": 0.2,
+      "label": "Month"
+    },
+    "y": {
+      "scale": "linear",
+      "nice": true,
+      "grid": true,
+      "label": "Revenue (USD)"
+    }
+  },
+  "theme": "light"
+}
+```
+
+## Render a file with the CLI
+
+No global installation is required. Use Node with `npx`, or run the same command with `bunx vizzo` or `pnpm dlx vizzo`.
+
+```sh
+npx vizzo line.json line.png --theme light
+```
+
+The output filename selects PNG. Without an output file or format, the CLI writes SVG to stdout. [CLI guide](/docs/cli)
+
+## Render with a URL
+
+Open this URL to render the same definition. JSURL2 replaces JSON punctuation with URL-friendly separators, so you can edit values directly.
+
+```text
+https://vizzo.dev/x?width=960&height=540&theme=light&data=(definition~(marks~!(type~lineY~data~!(month~Jan~revenue~42000)(month~Feb~revenue~58000)(month~Mar~revenue~76000)(month~Apr~revenue~64000)(month~May~revenue~81000)(month~Jun~revenue~93000)~options~(x~month~y~revenue~points~~stroke~**H2563eb))~x~(scale~point~padding~0.2~label~Month)y~(scale~linear~nice~~grid~~label~Revenue_*CUSD*D))theme~light)~
+```
+
+Use `data` with raw JSON or base64 if your integration already generates those. For larger definitions, send the JSON envelope in a POST body. [HTTP guide](/docs/http)
+
+## Render with POST
+
+```sh
+curl https://vizzo.dev/ \
+  -H 'Content-Type: application/json' \
+  --data-binary @line.json \
+  --output line.png
+```
+
+GET and POST return image bytes. The HTTP API defaults to PNG and allows 10 render requests per minute per IP. Rendering in the local CLI has no HTTP rate limit.
+
+## Share the result
+
+Attach the downloaded PNG or WebP in Slack, Discord, or a social post. A bot can upload the file with the platform's attachment API. For email, use an attached image or a hosted image in HTML according to your email provider's rules.
+
+The `twitter`, `discord`, `og`, and `linkedin` presets choose image dimensions. They do not publish a post or guarantee that a platform will unfurl a chart URL. [Formats and presets](/docs/reference)
+
+Want a different shape? [Browse the chart gallery](/docs/examples) for bars, layered areas, multiple series, UTC timelines, and pie charts.
+
+
+# Render from your terminal
+
+Source: https://vizzo.dev/docs/cli.md
+
+One command for a local chart. The same command for a scheduled report, a bot, or a CI job.
+
+## Run it anywhere Node runs
+
+```sh
+npx vizzo --help
+npm install --global vizzo
+vizzo line.json line.png
+```
+
+The published package works with Node. Bun and pnpm also work through `bunx vizzo` and `pnpm dlx vizzo`. Rendering uses TanStack Charts and Resvg directly. There is no browser or Canvas dependency.
+
+## Choose your input
+
+Pass a JSON envelope with a `definition` field. Input may be a file, inline JSON, stdin, or multiple files.
+
+```sh
+# A file, with a positional output path
+npx vizzo line.json line.png
+
+# Inline JSON
+npx vizzo '{"definition":{"marks":[{"type":"barY","data":[["A",4],["B",8],["C",6]],"options":{"x":"0","y":"1"}}],"x":{"scale":"band"},"y":{"scale":"linear"}}}' chart.png
+
+# Pipe an envelope from a script
+cat line.json | npx vizzo --format png > line.png
+
+# SVG goes to stdout when no output or format is given
+npx vizzo line.json > line.svg
+
+# Render a batch next to the source files
+npx vizzo './charts/*.json' --format webp
+```
+
+Use [line.json](/docs/examples/line.json) from the quick start to try these commands. Batch rendering writes one image per input file. `--output` is for one input only.
+
+## Set output options
+
+Flags override values in the JSON envelope. Explicit dimensions override a preset.
+
+| Flag | Short | What it changes |
+| --- | --- | --- |
+| `--output` | `-o` | Output path, also accepted as the last positional argument |
+| `--width` | `-w` | Positive integer width in pixels |
+| `--height` | `-h` | Positive integer height in pixels |
+| `--format` | `-f` | `svg`, `png`, or `webp` |
+| `--theme` | `-t` | `light` or `dark` |
+| `--preset` | `-p` | `og`, `twitter`, `linkedin`, or `discord` dimensions |
+| `--background` | | PNG/WebP canvas color behind transparent or uncovered chart areas |
+| `--font` | | Local `.ttf` or `.otf` for raster text |
+| `--help` | | Show usage |
+
+Use `--height` for height and `--help` for help. A lone `-h` also shows help.
+
+```sh
+npx vizzo line.json --output report.png --preset twitter --theme dark
+npx vizzo line.json report.webp --width 800 --height 450 --background '#ffffff'
+```
+
+The CLI defaults to 960 × 540 and SVG. An output extension selects a format unless `--format` or the envelope's `format` sets it explicitly. The public HTTP API has its own size and rate limits; the local CLI does not inherit them.
+
+## Use the SDK in a bot or job
+
+```ts
+import { writeFile } from 'node:fs/promises';
+import { render } from 'vizzo';
+import chart from './line.json' with { type: 'json' };
+
+const result = await render({
+  ...chart,
+  format: 'png',
+  preset: 'discord',
+  theme: 'dark',
+});
+
+await writeFile('report.png', result.data);
+```
+
+`render()` returns `{ format, width, height, data }`. SVG data is a string; PNG and WebP data are `Uint8Array`. Upload those bytes as a file attachment through your Slack or Discord bot, or save them for an email report.
+
+See [chart definitions](/docs/chart-definitions) for the JSON mapping and [reference](/docs/reference) for theme and preset details.
+
+
+# A URL that makes a chart
+
+Source: https://vizzo.dev/docs/http.md
+
+Open an editable JSURL2 link or send JSON. Get back PNG, SVG, or WebP bytes.
+
+## Open a chart with GET
+
+The render route is `GET https://vizzo.dev/x`. Put the render envelope in the `data` parameter and add output options as query parameters.
+
+```text
+https://vizzo.dev/x?width=960&height=540&theme=light&data=(definition~(marks~!(type~lineY~data~!(month~Jan~revenue~42000)(month~Feb~revenue~58000)(month~Mar~revenue~76000)(month~Apr~revenue~64000)(month~May~revenue~81000)(month~Jun~revenue~93000)~options~(x~month~y~revenue~points~~stroke~**H2563eb))~x~(scale~point~padding~0.2~label~Month)y~(scale~linear~nice~~grid~~label~Revenue_*CUSD*D))theme~light)~
+```
+
+[Open the chart](https://vizzo.dev/x?width=960&height=540&theme=light&data=(definition~(marks~!(type~lineY~data~!(month~Jan~revenue~42000)(month~Feb~revenue~58000)(month~Mar~revenue~76000)(month~Apr~revenue~64000)(month~May~revenue~81000)(month~Jun~revenue~93000)~options~(x~month~y~revenue~points~~stroke~**H2563eb))~x~(scale~point~padding~0.2~label~Month)y~(scale~linear~nice~~grid~~label~Revenue_*CUSD*D))theme~light)~), then edit `width`, `height`, or `theme` in the URL. Query options override the same fields inside the envelope. The API returns image bytes, not a page or a JSON wrapper.
+
+## JSURL2 is the default for our examples
+
+JSURL2 encodes the existing JSON envelope with readable separators. It does not change the chart grammar. Use the small `jsurl2` package to create a link.
+
+```ts
+import { stringify } from 'jsurl2';
+
+const envelope = {
+  definition: {
+    marks: [{
+      type: 'barY',
+      data: [['A', 4], ['B', 8], ['C', 6]],
+      options: { x: '0', y: '1' },
+    }],
+    x: { scale: 'band' },
+    y: { scale: 'linear' },
+  },
+};
+
+const url = `https://vizzo.dev/x?width=800&data=${stringify(envelope)}`;
+```
+
+JSURL2 escapes URL delimiters itself. Keep its string directly after `data=` to preserve readable parentheses and tildes. An additional `URLSearchParams` encoding also works, but escapes some of that punctuation again. Do not invent or hand-encode JSURL2 escapes; use the library when values contain reserved characters or Unicode.
+
+## Raw JSON and base64 work too
+
+All three encodings use the same `data` parameter. The API detects the encoding and validates the decoded envelope with the same Zod schema as POST.
+
+```ts
+// Raw JSON, safely percent-encoded
+const raw = new URL('https://vizzo.dev/x');
+raw.searchParams.set('data', JSON.stringify(envelope));
+
+// UTF-8 JSON as base64url in Node or Bun
+const data = Buffer.from(JSON.stringify(envelope), 'utf8').toString('base64url');
+const base64 = `https://vizzo.dev/x?data=${data}`;
+```
+
+Standard base64 also works. Encode it with `URLSearchParams` so `+` does not become a space. Base64 hides the chart structure and is not compression. JSON without whitespace is smaller than pretty-printed JSON for every encoding.
+
+## Send JSON with POST
+
+`POST https://vizzo.dev/` accepts an envelope as an `application/json` body. Use POST when a chart has many rows or a link would exceed a browser, proxy, or chat application's URL limit.
+
+```sh
+curl https://vizzo.dev/ \
+  -H 'Content-Type: application/json' \
+  --data-binary @line.json \
+  --output line.png
+```
+
+```ts
+const response = await fetch('https://vizzo.dev/', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ ...envelope, format: 'webp', theme: 'dark' }),
+});
+
+if (!response.ok) throw new Error(await response.text());
+const image = await response.arrayBuffer();
+```
+
+## Output options
+
+| Field | Default | Accepted values |
+| --- | --- | --- |
+| `data` | Required for GET | JSURL2, percent-encoded JSON, base64, or base64url render envelope |
+| `definition` | Required inside the envelope | TanStack Charts definition |
+| `width` | 960 | Integer from 1 to 2,000 |
+| `height` | 540 | Integer from 1 to 2,000 |
+| `format` | `png` | `png`, `svg`, `webp` |
+| `theme` | Chart's theme | `light`, `dark` |
+| `preset` | None | `og`, `twitter`, `linkedin`, `discord` |
+| `background` | Theme background | PNG/WebP canvas color behind transparent or uncovered chart areas |
+
+Dimensions from `preset` apply when no explicit width or height is given. On GET, query fields override fields in `data`. Use a field once; duplicate or unknown query parameters are rejected. POST dimensions must be JSON numbers, not strings.
+
+`HEAD /x` uses GET validation and rendering, then returns headers without an image body. It consumes a render request. Other methods on `/x` return `405`. `OPTIONS /` handles browser CORS preflight without consuming a render request. The API permits cross-origin requests.
+
+## Public limits and errors
+
+GET and POST share an allowance of 10 render requests per minute per IP address. Cloudflare's limiter is approximate and local to each location. Responses are not publicly cached by the renderer.
+
+The JSON payload limit is 1 MiB, measured after decoding. Encoded GET inputs are also bounded before parsing. Output dimensions are at most 2,000 × 2,000. The sum of all mark data arrays must not exceed 10,000 rows; two marks over the same 6,000 rows count as 12,000.
+
+| Status | Meaning | What to change |
+| --- | --- | --- |
+| `200` | Image bytes | Read `Content-Type` to identify the format |
+| `400` | Invalid encoding, JSON, options, definition, or render input | Read the JSON error and validation `issues` when present |
+| `405` | Unsupported method | Use GET on `/x` or POST on `/` |
+| `413` | Request data is too large | Reduce input size or row count; POST still has the 1 MiB body limit |
+| `415` | Unsupported POST content type | Set `Content-Type: application/json` |
+| `429` | Rate limit exceeded | Wait before requesting another render |
+
+Dimension and row limits fail validation with `400`. Oversized input bytes return `413`. Errors are JSON with an `error` message. Download an image once and upload the file to your messaging platform; each new render URL request counts toward the allowance.
+
+
+# The TanStack Charts grammar
+
+Source: https://vizzo.dev/docs/chart-definitions.md
+
+Marks, data, scales, and colors. Vizzo keeps the names and options you know from TanStack Charts.
+
+## TanStack calls, encoded as JSON
+
+Vizzo uses [TanStack Charts](https://tanstack.com/charts) to build the chart scene. It translates JSON into the library's mark and scale factories. The names and options stay the same.
+
+This TanStack mark call:
+
+```ts
+lineY(data, { x: 'month', y: 'revenue', points: true, stroke: '#2563eb' })
+```
+
+becomes this JSON mark:
+
+```json
+{
+  "type": "lineY",
+  "data": [{ "month": "Jan", "revenue": 42000 }, { "month": "Feb", "revenue": 58000 }],
+  "options": { "x": "month", "y": "revenue", "points": true, "stroke": "#2563eb" }
+}
+```
+
+Put marks inside `{ "definition": { "marks": [...] } }`, then pass that envelope to a URL, POST, the CLI, or the SDK. JSURL2 changes the transport encoding only.
+
+## Choose a mark
+
+| Mark | Useful for |
+| --- | --- |
+| `lineY`, `lineX` | Connected trends |
+| `areaY` | Filled trends, often layered with a line |
+| `barY`, `barX` | Vertical and horizontal comparisons |
+| `dot` | Points and scatter plots |
+| `ruleY`, `ruleX` | Reference lines and thresholds |
+| `pie` | Category proportions; `innerRadius` makes a donut |
+
+Layer multiple marks in one `marks` array. Each mark has its own `data` and `options`. A line over an area, a rule over bars, or dots on a trend uses the same grammar. See [real examples](/docs/examples).
+
+## Pick scales that match the data
+
+| JSON scale | TanStack factory | Use |
+| --- | --- | --- |
+| `linear` | `scaleLinear()` | Continuous numbers |
+| `band` | `scaleBand()` | Bars across categories |
+| `point` | `scalePoint()` | Lines or points across categories |
+| `ordinal` | `scaleOrdinal()` | Discrete values |
+| `utc` | `scaleUtc()` | UTC dates |
+
+Set scales and axis options on `definition.x` and `definition.y`. `padding`, `nice`, `grid`, `label`, and `axis` map to TanStack's axis options. Set an axis to `null` to disable it. ISO date strings become dates for the UTC scale.
+
+```json
+{
+  "x": { "scale": "point", "label": "Month", "padding": 0.2 },
+  "y": { "scale": "linear", "nice": true, "grid": true, "label": "Revenue (USD)" }
+}
+```
+
+## Group lines and control color
+
+Set `z` to a series field and `color` to that field in the mark options. A color legend can show the series names. A fixed `stroke` or `fill` gives a single mark an explicit color.
+
+```json
+{
+  "type": "lineY",
+  "data": [
+    { "week": "W1", "downloads": 120, "package": "core" },
+    { "week": "W2", "downloads": 180, "package": "core" },
+    { "week": "W1", "downloads": 60, "package": "cli" },
+    { "week": "W2", "downloads": 95, "package": "cli" }
+  ],
+  "options": { "x": "week", "y": "downloads", "z": "package", "color": "package" }
+}
+```
+
+At definition level, `color.domain` and `color.range` set category/color mappings. `color.legend` accepts `true` or `{ "label": "Package" }`.
+
+## What JSON can express
+
+Field names such as `"x": "month"` become accessors into each row. With array rows, `"x": "0"` selects the first item. Constant options such as `strokeWidth`, `fillOpacity`, and `innerRadius` pass through to the matching mark factory.
+
+JSON cannot contain JavaScript functions, custom callbacks, React components, or interaction handlers. Vizzo supports the marks and scale kinds listed here, not every browser-only TanStack feature. It generates a static scene and serializes that scene to SVG. Resvg rasterizes PNG and WebP.
+
+Use the [JSON Schema](/schema.json) for the envelope and definition shape. Mark `options` follow TanStack's API, so the schema does not enumerate every option or validate every possible TanStack combination. A valid JSON envelope can still fail rendering if the chart options do not form a valid scene.
+
+
+# Pick a chart. Make it yours.
+
+Source: https://vizzo.dev/docs/examples.md
+
+Lines, bars, layered areas, multiple series, dates, and proportions. Every image starts with the same small JSON envelope.
+
+## Start from a working definition
+
+Every preview is a static SVG rendered by Vizzo. Opening a chart URL requests a PNG from the public renderer. Copy the JSURL2 URL and change values in the address bar, or download the JSON to render it locally.
+
+Use PNG for broad attachment support, WebP for smaller files when your destination accepts it, and SVG when you need scalable vector output. The renderer does not publish or send anything for you.
+
+## Line chart
+
+![Monthly revenue line chart](/docs/examples/line.svg)
+
+[Download JSON](/docs/examples/line.json) · [Open editable chart URL](https://vizzo.dev/x?width=960&height=540&theme=light&data=(definition~(marks~!(type~lineY~data~!(month~Jan~revenue~42000)(month~Feb~revenue~58000)(month~Mar~revenue~76000)(month~Apr~revenue~64000)(month~May~revenue~81000)(month~Jun~revenue~93000)~options~(x~month~y~revenue~points~~stroke~**H2563eb))~x~(scale~point~padding~0.2~label~Month)y~(scale~linear~nice~~grid~~label~Revenue_*CUSD*D))theme~light)~)
+
+```sh
+npx vizzo line.json line.png --theme light
+```
+
+## Multiple series
+
+![Downloads grouped by package](/docs/examples/multi-series.svg)
+
+The `z` field groups the line paths. The `color` field gives each package a color and legend entry.
+
+[Download JSON](/docs/examples/multi-series.json) · [Open editable chart URL](https://vizzo.dev/x?width=960&height=540&theme=light&data=(definition~(marks~!(type~lineY~data~!(week~W1~downloads~120~package~core)(week~W2~downloads~180~package~core)(week~W3~downloads~260~package~core)(week~W4~downloads~310~package~core)(week~W1~downloads~60~package~cli)(week~W2~downloads~95~package~cli)(week~W3~downloads~140~package~cli)(week~W4~downloads~205~package~cli)(week~W1~downloads~20~package~schemas)(week~W2~downloads~28~package~schemas)(week~W3~downloads~45~package~schemas)(week~W4~downloads~70~package~schemas)~options~(x~week~y~downloads~z~package~color~package~strokeWidth~2.5~points))~x~(scale~point~label~Week)y~(scale~linear~nice~~grid~~label~Downloads)color~(legend~(label~Package)))theme~light)~)
+
+```sh
+npx vizzo multi-series.json multi-series.png --theme light
+```
+
+## Bar chart
+
+![Letter frequencies as bars](/docs/examples/bar.svg)
+
+The `band` scale provides space for each category. For a horizontal comparison, change `barY` to `barX`, exchange the x/y field mappings, and put the band scale on y and the linear scale on x.
+
+[Download JSON](/docs/examples/bar.json) · [Open editable chart URL](https://vizzo.dev/x?width=960&height=540&theme=light&data=(definition~(marks~!(type~barY~data~!(letter~A~frequency~0.08167)(letter~B~frequency~0.01492)(letter~E~frequency~0.12702)(letter~T~frequency~0.09056)(letter~O~frequency~0.07507)(letter~I~frequency~0.06966)~options~(x~letter~y~frequency~fill~**H16a34a))~x~(scale~band~padding~0.12~label~Letter)y~(scale~linear~nice~~grid~~label~Frequency))theme~light)~)
+
+```sh
+npx vizzo bar.json bar.png --theme light
+```
+
+## Layered area and line
+
+![Weekly active users with area and line marks](/docs/examples/area.svg)
+
+The same data feeds an `areaY` mark and a `lineY` mark. This uses the normal `marks` array, without a special combined chart type.
+
+[Download JSON](/docs/examples/area.json) · [Open editable chart URL](https://vizzo.dev/x?width=960&height=540&theme=light&data=(definition~(marks~!(type~areaY~data~!(day~Mon~users~120)(day~Tue~users~156)(day~Wed~users~142)(day~Thu~users~189)(day~Fri~users~205)(day~Sat~users~98)(day~Sun~users~84)~options~(x~day~y~users~fill~**H0891b2~fillOpacity~0.25))(type~lineY~data~!(day~Mon~users~120)(day~Tue~users~156)(day~Wed~users~142)(day~Thu~users~189)(day~Fri~users~205)(day~Sat~users~98)(day~Sun~users~84)~options~(x~day~y~users~stroke~**H0891b2))~x~(scale~point~label~Day)y~(scale~linear~nice~~grid~~label~Active_Users))theme~light)~)
+
+```sh
+npx vizzo area.json area.png --theme light
+```
+
+## UTC time series
+
+![Monthly signups over a UTC date axis](/docs/examples/time-series.svg)
+
+Use ISO date strings with `"scale": "utc"`. Vizzo hydrates the date values for TanStack's UTC scale.
+
+[Download JSON](/docs/examples/time-series.json) · [Open editable chart URL](https://vizzo.dev/x?width=960&height=540&theme=light&data=(definition~(marks~!(type~lineY~data~!(date~*2024-01-01~value~42)(date~*2024-02-01~value~58)(date~*2024-03-01~value~51)(date~*2024-04-01~value~66)(date~*2024-05-01~value~74)(date~*2024-06-01~value~69)(date~*2024-07-01~value~88)(date~*2024-08-01~value~95)(date~*2024-09-01~value~82)(date~*2024-10-01~value~101)(date~*2024-11-01~value~96)(date~*2024-12-01~value~118)~options~(x~date~y~value~points~~stroke~**H7c3aed))~x~(scale~utc~label~Month)y~(scale~linear~nice~~grid~~label~Signups))theme~light)~)
+
+```sh
+npx vizzo time-series.json time-series.png --theme light
+```
+
+## Pie chart
+
+![Letter frequency proportions as a pie chart](/docs/examples/pie.svg)
+
+The `value` option defines the slice size. Set `innerRadius` above zero for a donut.
+
+[Download JSON](/docs/examples/pie.json) · [Open editable chart URL](https://vizzo.dev/x?width=960&height=540&theme=light&data=(definition~(marks~!(type~pie~data~!(letter~E~frequency~0.12702)(letter~T~frequency~0.09056)(letter~A~frequency~0.08167)(letter~O~frequency~0.07507)(letter~I~frequency~0.06966)(letter~N~frequency~0.06749)~options~(value~frequency~color~letter~key~letter~innerRadius~0))~color~(legend~(label~Letter)))theme~light)~)
+
+```sh
+npx vizzo pie.json pie.png --theme light
+```
+
+## Send a report to a conversation
+
+```sh
+# A dark PNG sized for a Discord attachment
+npx vizzo multi-series.json report.png --preset discord --theme dark
+
+# A PNG sized for a tweet
+npx vizzo line.json update.png --preset twitter
+
+# A compact image for an email body
+npx vizzo area.json digest.png --width 800 --height 450
+```
+
+Upload the generated file to your destination. For automated reports, call the SDK or [HTTP API](/docs/http), then pass the returned bytes to your platform's attachment API. To send any downloaded example as JSON over HTTP:
+
+```sh
+curl https://vizzo.dev/ \
+  -H 'Content-Type: application/json' \
+  --data-binary @multi-series.json \
+  --output multi-series.png
+```
+
+
+# Options at a glance
+
+Source: https://vizzo.dev/docs/reference.md
+
+Output formats, dimensions, themes, presets, and the shape of a render request.
+
+## The render envelope
+
+Vizzo accepts the same envelope through the CLI and HTTP API. The SDK accepts the fields below plus local rendering options such as `font` and `ariaLabel`.
+
+```json
+{
+  "definition": {
+    "marks": [{
+      "type": "barY",
+      "data": [["A", 4], ["B", 8], ["C", 6]],
+      "options": { "x": "0", "y": "1" }
+    }],
+    "x": { "scale": "band" },
+    "y": { "scale": "linear" }
+  },
+  "width": 960,
+  "height": 540,
+  "format": "png",
+  "theme": "light"
+}
+```
+
+| Field | Required | Meaning |
+| --- | --- | --- |
+| `definition` | Yes | JSON encoding of TanStack marks, axes, color, margins, and theme |
+| `width` | No | Positive integer pixel width |
+| `height` | No | Positive integer pixel height |
+| `format` | No | `svg`, `png`, or `webp` |
+| `theme` | No | Named `light` or `dark` theme |
+| `preset` | No | Social image dimensions |
+| `background` | No | Raster background color |
+
+The default size is 960 × 540. The CLI and SDK default to SVG; the HTTP API defaults to PNG. An explicit dimension wins over a preset dimension. A CLI flag wins over the matching envelope field. On GET, a query parameter wins over the matching field inside `data`.
+
+## Image formats
+
+| Format | Content type | Use |
+| --- | --- | --- |
+| PNG | `image/png` | Slack and Discord attachments, tweets, and email images |
+| WebP | `image/webp` | Smaller raster files where supported |
+| SVG | `image/svg+xml` | Vector output, web pages, and graphics tools |
+
+Vizzo vendors Roboto for raster text. The CLI can use `--font` for a local font file. The public HTTP API uses its bundled font and does not accept a font upload.
+
+## Themes and background
+
+`theme=dark` sets light text, a dark background, and muted grid lines. `theme=light` sets dark text on white. Definition-level theme values override the named theme. Explicit mark colors stay explicit, so choose brighter strokes for a dark chart when needed.
+
+```text
+https://vizzo.dev/x?width=960&height=540&theme=dark&data=(definition~(marks~!(type~lineY~data~!(month~Jan~revenue~42000)(month~Feb~revenue~58000)(month~Mar~revenue~76000)(month~Apr~revenue~64000)(month~May~revenue~81000)(month~Jun~revenue~93000)~options~(x~month~y~revenue~points~~stroke~**H2563eb))~x~(scale~point~padding~0.2~label~Month)y~(scale~linear~nice~~grid~~label~Revenue_*CUSD*D))theme~light)~
+```
+
+For PNG and WebP, `background` fills the raster canvas behind the chart. An opaque named or definition-level theme background covers that canvas. Change `definition.theme.background` to recolor the visible chart background in every format. Encode a literal `#` as `%23` in a query parameter.
+
+`definition.theme` may set `foreground`, `muted`, `grid`, `background`, and `palette`. Use those values when your chart should match a report's palette.
+
+## Social presets
+
+| Preset | Size |
+| --- | --- |
+| `og` | 1200 × 630 |
+| `twitter` | 1200 × 675 |
+| `linkedin` | 1200 × 627 |
+| `discord` | 1200 × 630 |
+
+Presets only choose dimensions. Attach the result to your post, message, or email. A raw chart URL may not produce a rich social preview on every platform.
+
+## Definition fields
+
+`marks` is required and contains at least one mark. Other definition fields are `x`, `y`, `color`, `margin`, `clip`, `frame`, and `theme`. `margin` accepts a number or an object such as `{ "top": 24, "right": 24, "bottom": 48, "left": 64 }`.
+
+See [chart definitions](/docs/chart-definitions) for supported marks/scales and the JSON-to-TanStack mapping. See [HTTP limits](/docs/http#public-limits-and-errors) for the public endpoint's validation and rate limits.
+
+## Documentation for agents
+
+- [llms.txt](/llms.txt) is a short index of the guides.
+- [llms-full.txt](/llms-full.txt) contains the full guides and concrete commands/URLs.
+- Every guide has a raw Markdown version, such as [the HTTP guide](/docs/http.md).
+- [schema.json](/schema.json) describes the Zod render envelope. HTTP limits are documented separately.
+- [Example JSON files](/docs/examples/line.json) contain real, renderable chart definitions.
+
+All exports come from the same Markdown and chart definitions as these pages. An agent can fetch a guide, edit a definition, validate the envelope, and render it with the CLI or API.

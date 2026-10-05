@@ -1,0 +1,13 @@
+# Vizzo
+
+> Render JSON-encoded TanStack Charts definitions to PNG, SVG, and WebP. Use the CLI, GET /x with a JSURL2, JSON, or base64 data parameter, or POST / with a JSON body.
+
+## Documentation
+- [Quick start](https://vizzo.dev/docs/index.md): Turn a TanStack Charts definition into an image with a URL, the CLI, or a POST request.
+- [CLI](https://vizzo.dev/docs/cli.md): One command for a local chart. The same command for a scheduled report, a bot, or a CI job.
+- [URL & HTTP API](https://vizzo.dev/docs/http.md): Open an editable JSURL2 link or send JSON. Get back PNG, SVG, or WebP bytes.
+- [Chart definitions](https://vizzo.dev/docs/chart-definitions.md): Marks, data, scales, and colors. Vizzo keeps the names and options you know from TanStack Charts.
+- [Chart gallery](https://vizzo.dev/docs/examples.md): Lines, bars, layered areas, multiple series, dates, and proportions. Every image starts with the same small JSON envelope.
+- [Reference](https://vizzo.dev/docs/reference.md): Output formats, dimensions, themes, presets, and the shape of a render request.
+- [Complete documentation](https://vizzo.dev/llms-full.txt)
+- [JSON Schema](https://vizzo.dev/schema.json): The render envelope. HTTP-specific limits are in the HTTP guide.

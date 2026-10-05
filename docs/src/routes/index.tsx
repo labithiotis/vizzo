@@ -87,6 +87,12 @@ function Home() {
             </div>
             <div className="vizzo-rise mt-5 flex flex-wrap items-center gap-4" style={{ animationDelay: '0.3s' }}>
               <a
+                href="/docs"
+                className="rounded-md bg-plotter-blue px-4 py-2.5 font-mono-display text-white text-xs uppercase tracking-wide hover:opacity-85"
+              >
+                Read the docs →
+              </a>
+              <a
                 href="https://github.com/vizzo/vizzo"
                 className="flex items-center gap-2 rounded-md bg-ink px-4 py-2.5 font-mono-display text-paper text-xs uppercase tracking-wide transition hover:opacity-85 dark:bg-paper dark:text-ink"
               >

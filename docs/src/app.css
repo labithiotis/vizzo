@@ -11,9 +11,48 @@
   --color-paper-dark: #0e1013;
   --color-ink-dark: #e9ecef;
   --color-grid-dark: #23262b;
+  --color-doc-canvas: #f4f7fb;
+  --color-doc-sheet: #ffffff;
+  --color-doc-ink: #17212f;
+  --color-doc-muted: #556579;
+  --color-doc-rule: #dde5ef;
 
   --font-mono-display: "JetBrains Mono", ui-monospace, monospace;
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+}
+
+.docs-feedback {
+  transition: opacity 140ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .docs-press {
+    transition: transform 140ms cubic-bezier(0.23, 1, 0.32, 1);
+  }
+  .docs-press:active:not(:focus-visible) {
+    transform: scale(0.97);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .docs-press {
+    transition: none;
+  }
+  .docs-press:active:not(:focus-visible) {
+    transform: none;
+  }
+  .docs-feedback {
+    transition-duration: 100ms;
+  }
+}
+
+@layer base {
+  a:focus-visible,
+  button:focus-visible,
+  summary:focus-visible {
+    outline: 2px solid var(--color-plotter-blue);
+    outline-offset: 4px;
+  }
 }
 
 .vizzo-trace {
