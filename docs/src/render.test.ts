@@ -29,6 +29,11 @@ function allowedLimiter() {
   return { limit: mock(async () => ({ success: true })) } satisfies RateLimit;
 }
 
+function queryRequest(body: unknown, options: Record<string, string> = {}) {
+  const query = new URLSearchParams({ data: typeof body === 'string' ? body : JSON.stringify(body), ...options });
+  return new Request(`https://vizzo.dev/x?${query}`, { headers: { 'CF-Connecting-IP': '203.0.113.1' } });
+}
+
 describe('POST /', () => {
   test('defaults to PNG and uses the connecting IP for the rate limit', async () => {
     const limiter = allowedLimiter();
@@ -66,6 +71,7 @@ describe('POST /', () => {
     { definition, width: 2001 },
     { definition, height: 2001 },
     { definition, width: 0 },
+    { definition, width: '200' },
     { definition, format: 'jpeg' },
     { definition, font: '/tmp/font.ttf' },
   ])('rejects invalid render options: %j', async (body) => {
@@ -116,5 +122,155 @@ describe('POST /', () => {
     expect(response.headers.get('Access-Control-Allow-Methods')).toBe('POST, OPTIONS');
     expect(response.headers.get('Access-Control-Allow-Headers')).toBe('Content-Type');
     expect(limiter.limit).not.toHaveBeenCalled();
+  });
+});
+
+describe('GET /x', () => {
+  test('parses query options for the TanStack HEAD fallback', async () => {
+    const head = new Request(queryRequest({ definition }, { width: '200', height: '120', format: 'svg' }), {
+      method: 'HEAD',
+    });
+    const response = await renderRequest(head, allowedLimiter());
+    expect(response.status).toBe(200);
+    expect(response.headers.get('Content-Type')).toBe('image/svg+xml');
+    expect(await response.text()).toContain('viewBox="0 0 200 120"');
+  });
+
+  test('defaults to the same PNG as POST without a content type', async () => {
+    const limiter = allowedLimiter();
+    const response = await renderRequest(queryRequest({ definition }), limiter);
+    const post = await renderRequest(request({ definition }), allowedLimiter());
+    expect(response.status).toBe(200);
+    expect(response.headers.get('Content-Type')).toBe('image/png');
+    expect(response.headers.get('Access-Control-Allow-Origin')).toBe('*');
+    expect(limiter.limit).toHaveBeenCalledWith({ key: '203.0.113.1' });
+    expect(new Uint8Array(await response.arrayBuffer())).toEqual(new Uint8Array(await post.arrayBuffer()));
+  });
+
+  test.each(['svg', 'png', 'webp'] as const)('query options override JSON options for %s', async (format) => {
+    const input = { definition, width: 400, height: 240, format: 'svg', theme: 'light', background: '#000' };
+    const response = await renderRequest(
+      queryRequest(input, { width: '200', height: '120', format, theme: 'dark', background: '#fff' }),
+      allowedLimiter(),
+    );
+    expect(response.status).toBe(200);
+    expect(response.headers.get('Content-Type')).toBe(format === 'svg' ? 'image/svg+xml' : `image/${format}`);
+    const expected = await render({ definition, width: 200, height: 120, format, theme: 'dark', background: '#fff' });
+    expect(response.headers.get('Content-Security-Policy')).toBe(
+      "default-src 'none'; style-src 'unsafe-inline'; sandbox",
+    );
+    const bytes = typeof expected.data === 'string' ? new TextEncoder().encode(expected.data) : expected.data;
+    expect(new Uint8Array(await response.arrayBuffer())).toEqual(new Uint8Array(bytes));
+  });
+
+  test('applies query overrides before validating JSON options', async () => {
+    const response = await renderRequest(
+      queryRequest(
+        { definition, width: 'invalid', height: -1, format: 'jpeg' },
+        { width: '200', height: '120', format: 'svg' },
+      ),
+      allowedLimiter(),
+    );
+    expect(response.status).toBe(200);
+    expect(await response.text()).toContain('viewBox="0 0 200 120"');
+  });
+
+  test('preserves JSON options when query overrides are omitted', async () => {
+    const response = await renderRequest(
+      queryRequest({ definition, width: 200, height: 120, format: 'svg' }),
+      allowedLimiter(),
+    );
+    expect(response.status).toBe(200);
+    expect(response.headers.get('Content-Type')).toBe('image/svg+xml');
+    expect(await response.text()).toContain('viewBox="0 0 200 120"');
+  });
+
+  test.each(['width', 'height'])('GET and POST report the same %s limit errors', async (dimension) => {
+    const post = await renderRequest(request({ definition, [dimension]: 2001 }), allowedLimiter());
+    const get = await renderRequest(queryRequest({ definition }, { [dimension]: '2001' }), allowedLimiter());
+    expect(post.status).toBe(400);
+    expect(get.status).toBe(400);
+    expect(await get.json()).toEqual(await post.json());
+  });
+
+  test.each(['width', 'data'])('rejects repeated scalar query parameters: %s', async (parameter) => {
+    const url = new URL(queryRequest({ definition }, { width: '200' }).url);
+    url.searchParams.append(parameter, url.searchParams.get(parameter) ?? '');
+    const response = await renderRequest(new Request(url), allowedLimiter());
+    expect(response.status).toBe(400);
+    expect(await response.json()).toHaveProperty('issues');
+  });
+
+  test('accepts presets in query parameters', async () => {
+    const response = await renderRequest(
+      queryRequest({ definition }, { preset: 'og', format: 'svg' }),
+      allowedLimiter(),
+    );
+    expect(response.status).toBe(200);
+    expect(await response.text()).toContain('viewBox="0 0 1200 630"');
+  });
+
+  const invalidQueryOptions: Record<string, string>[] = [
+    { width: '2001' },
+    { height: '2001' },
+    { width: '0' },
+    { width: '' },
+    { width: '1.5' },
+    { width: 'nope' },
+    { width: 'Infinity' },
+    { format: 'jpeg' },
+    { font: '/tmp/font.ttf' },
+    { definition: JSON.stringify(definition) },
+  ];
+  test.each(invalidQueryOptions)('validates query options: %j', async (options) => {
+    const response = await renderRequest(queryRequest({ definition }, options), allowedLimiter());
+    expect(response.status).toBe(400);
+    expect(await response.json()).toHaveProperty('issues');
+  });
+
+  test.each(['{', '', 'null', '[]', '1', '"text"'])('rejects malformed or invalid data: %j', async (data) => {
+    const response = await renderRequest(queryRequest(data), allowedLimiter());
+    expect(response.status).toBe(400);
+  });
+
+  test('requires the data parameter', async () => {
+    const response = await renderRequest(new Request('https://vizzo.dev/x?width=200'), allowedLimiter());
+    expect(response.status).toBe(400);
+    expect(await response.json()).toHaveProperty('issues');
+  });
+
+  test('bounds decoded data by UTF-8 bytes', async () => {
+    const response = await renderRequest(
+      queryRequest({ definition, background: '€'.repeat(Math.ceil((1024 * 1024) / 3)) }),
+      allowedLimiter(),
+    );
+    expect(response.status).toBe(413);
+  });
+
+  test('bounds all decoded data before parsing repeated query parameters', async () => {
+    const url = new URL(queryRequest({ definition }).url);
+    url.searchParams.append('data', '€'.repeat(Math.ceil((1024 * 1024) / 3)));
+    const response = await renderRequest(new Request(url), allowedLimiter());
+    expect(response.status).toBe(413);
+  });
+
+  test('counts data rows across every mark', async () => {
+    const mark = { type: 'dot', data: Array.from({ length: 5001 }, () => ({ x: 1, y: 2 })) };
+    const response = await renderRequest(queryRequest({ definition: { marks: [mark, mark] } }), allowedLimiter());
+    expect(response.status).toBe(400);
+    expect(JSON.stringify(await response.json())).toContain('10000 total data rows');
+  });
+
+  test('uses the same rate limiter as POST before parsing data', async () => {
+    let remaining = 1;
+    const limiter = { limit: mock(async () => ({ success: remaining-- > 0 })) } satisfies RateLimit;
+    const post = await renderRequest(request({ definition, format: 'svg' }), limiter);
+    const response = await renderRequest(queryRequest('{'), limiter);
+    expect(post.status).toBe(200);
+    expect(response.status).toBe(429);
+    expect(response.headers.get('Retry-After')).toBe('60');
+    expect(response.headers.get('Access-Control-Expose-Headers')).toBe('Retry-After');
+    expect(limiter.limit).toHaveBeenNthCalledWith(1, { key: '203.0.113.1' });
+    expect(limiter.limit).toHaveBeenNthCalledWith(2, { key: '203.0.113.1' });
   });
 });

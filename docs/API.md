@@ -29,7 +29,7 @@ curl https://vizzo.dev/ \
 }
 ```
 
-Options belong in the JSON body. Query parameters do not configure rendering.
+For POST, options belong in the JSON body; query parameters are ignored.
 
 | Field | Behavior |
 | --- | --- |
@@ -44,23 +44,54 @@ The API uses the existing Vizzo Zod schema with these public limits:
 
 - At most 1 MiB of JSON, measured in bytes.
 - At most 10,000 data rows across all marks.
-- At most 10 POST requests per minute per IP, including invalid requests.
+- At most 10 rendering requests per minute per IP across POST and GET, including
+  invalid requests.
 
 Cloudflare's rate limiter uses approximate counters local to each Cloudflare
 location. Clients sharing an IP share an allowance. This is a throttle, not an
 exact global quota.
 
 Successful responses use `image/png`, `image/svg+xml`, or `image/webp` and are
-not cached. Browser requests are supported through public CORS and `OPTIONS /`.
+not cached. Browser requests use public CORS. JSON POST requests use
+`OPTIONS /` for preflights; GET requests without custom headers need no preflight.
 `GET /` continues to serve the website.
+
+## Render from a URL
+
+Send `GET https://vizzo.dev/x?width=200&data=<URL-encoded JSON>`. The required
+`data` parameter contains the same JSON envelope as the POST body, including
+`definition`. Optional `width`, `height`, `format`, `theme`, `preset`, and
+`background` query parameters override values in that JSON. PNG is the default.
+Unknown query parameters are rejected.
+Query values use TanStack's JSON-first parsing; repeated scalar parameters are rejected.
+
+```sh
+curl --get https://vizzo.dev/x \
+  --data-urlencode 'width=200' \
+  --data-urlencode 'data={"definition":{"marks":[{"type":"barY","data":[{"letter":"A","frequency":3},{"letter":"B","frequency":7}],"options":{"x":"letter","y":"frequency"}}],"x":{"scale":"band"},"y":{"scale":"linear"}}}' \
+  -o chart.png
+```
+
+Use `URLSearchParams` in JavaScript to encode JSON, including characters such as
+`&`, `+`, and `#`:
+
+```js
+const query = new URLSearchParams({ width: '200', data: JSON.stringify(options) });
+const imageUrl = `https://vizzo.dev/x?${query}`;
+```
+
+GET uses the same validation, CORS headers, rendering limits, and IP rate limit as
+POST. Missing or malformed `data` returns 400. Large charts should use POST;
+browsers and Cloudflare impose URL length limits before the Worker receives the
+request.
 
 Errors have a JSON `error` string. Validation errors also include Zod `issues`.
 
 | Status | Meaning |
 | --- | --- |
 | `400` | Invalid JSON, options, dimensions, or data row count. |
-| `413` | Request body exceeds 1 MiB. |
-| `415` | Content type is not `application/json`. |
+| `413` | Request body or decoded GET data exceeds 1 MiB. |
+| `415` | POST content type is not `application/json`. |
 | `429` | Rate limit exceeded; `Retry-After: 60` advises when to retry. |
 | `500` | Chart rendering failed. |
 

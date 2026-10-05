@@ -1,5 +1,7 @@
+import { defaultParseSearch } from '@tanstack/react-router';
 import { render } from '@vizzo/core';
 import { renderOptionsSchema } from '@vizzo/schemas';
+import { z } from 'zod';
 
 const MAX_BODY_BYTES = 1024 * 1024;
 const MAX_DIMENSION = 2000;
@@ -17,6 +19,13 @@ const apiOptionsSchema = renderOptionsSchema
     path: ['definition', 'marks'],
     message: `Charts may contain at most ${MAX_DATA_ROWS} total data rows.`,
   });
+
+const apiQuerySchema = renderOptionsSchema
+  .omit({ definition: true })
+  .extend({ data: z.record(z.string(), z.unknown()) })
+  .strict()
+  .transform(({ data, ...overrides }) => ({ ...data, ...overrides }))
+  .pipe(apiOptionsSchema);
 
 function errorResponse(error: string, status: number, headers: Record<string, string> = {}) {
   return Response.json({ error }, { status, headers: { ...CORS_HEADERS, ...headers } });
@@ -44,6 +53,27 @@ async function readBody(request: Request) {
   }
 }
 
+async function readOptions(request: Request) {
+  if (request.method === 'GET' || request.method === 'HEAD') {
+    const url = new URL(request.url);
+    const data = url.searchParams.getAll('data').join('');
+    if (new TextEncoder().encode(data).byteLength > MAX_BODY_BYTES) {
+      return errorResponse('Request data must not exceed 1 MiB.', 413);
+    }
+    return apiQuerySchema.safeParse(defaultParseSearch(url.search));
+  }
+  if (request.headers.get('Content-Type')?.split(';')[0]?.trim().toLowerCase() !== 'application/json') {
+    return errorResponse('Content-Type must be application/json.', 415);
+  }
+  const body = await readBody(request);
+  if (body === null) return errorResponse('Request body must not exceed 1 MiB.', 413);
+  try {
+    return apiOptionsSchema.safeParse(JSON.parse(body));
+  } catch {
+    return errorResponse('Request body must be valid JSON.', 400);
+  }
+}
+
 export async function renderRequest(request: Request, limiter: RateLimit): Promise<Response> {
   if (request.method === 'OPTIONS') {
     return new Response(null, {
@@ -59,18 +89,8 @@ export async function renderRequest(request: Request, limiter: RateLimit): Promi
   try {
     const { success } = await limiter.limit({ key: request.headers.get('CF-Connecting-IP') ?? 'unknown' });
     if (!success) return errorResponse('Rate limit exceeded. Try again in 60 seconds.', 429, { 'Retry-After': '60' });
-    if (request.headers.get('Content-Type')?.split(';')[0]?.trim().toLowerCase() !== 'application/json') {
-      return errorResponse('Content-Type must be application/json.', 415);
-    }
-    const body = await readBody(request);
-    if (body === null) return errorResponse('Request body must not exceed 1 MiB.', 413);
-    let input: unknown;
-    try {
-      input = JSON.parse(body);
-    } catch {
-      return errorResponse('Request body must be valid JSON.', 400);
-    }
-    const options = apiOptionsSchema.safeParse(input);
+    const options = await readOptions(request);
+    if (options instanceof Response) return options;
     if (!options.success) {
       return Response.json(
         { error: 'Invalid render options.', issues: options.error.issues },
@@ -83,6 +103,7 @@ export async function renderRequest(request: Request, limiter: RateLimit): Promi
         ...CORS_HEADERS,
         'Content-Type': result.format === 'svg' ? 'image/svg+xml' : `image/${result.format}`,
         'Cache-Control': 'no-store',
+        'Content-Security-Policy': "default-src 'none'; style-src 'unsafe-inline'; sandbox",
         'X-Content-Type-Options': 'nosniff',
       },
     });

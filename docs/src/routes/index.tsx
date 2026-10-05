@@ -1,3 +1,4 @@
+import { env } from 'cloudflare:workers';
 import { createFileRoute } from '@tanstack/react-router';
 import { ChartWindow } from '~/components/ChartWindow';
 import { ExampleGallery } from '~/components/ExampleGallery';
@@ -5,9 +6,16 @@ import { FeatureList } from '~/components/FeatureList';
 import { GithubMark } from '~/components/GithubMark';
 import { Squiggle } from '~/components/Squiggle';
 import { Terminal } from '~/components/Terminal';
+import { renderRequest } from '~/render';
 
 export const Route = createFileRoute('/')({
   component: Home,
+  server: {
+    handlers: {
+      POST: ({ request }) => renderRequest(request, env.RENDER_RATE_LIMIT),
+      OPTIONS: ({ request }) => renderRequest(request, env.RENDER_RATE_LIMIT),
+    },
+  },
 });
 
 const RENDER_COMMAND = 'npx vizzo chart.json chart.png';
