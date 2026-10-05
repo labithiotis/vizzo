@@ -89,11 +89,19 @@ const image = await response.arrayBuffer();
 
 Dimensions from `preset` apply when no explicit width or height is given. On GET, query fields override fields in `data`. Use a field once; duplicate or unknown query parameters are rejected. POST dimensions must be JSON numbers, not strings.
 
-`HEAD /x` uses GET validation and rendering, then returns headers without an image body. It consumes a render request. Other methods on `/x` return `405`. `OPTIONS /` handles browser CORS preflight without consuming a render request. The API permits cross-origin requests.
+`HEAD /x` returns GET headers without an image body and shares its cache entry. On a cache miss it consumes a render request. Other methods on `/x` return `405`. `OPTIONS /` handles browser CORS preflight without consuming a render request. The API permits cross-origin requests.
+
+## Image caching
+
+Successful GET images are publicly cached for 30 days in browsers and Cloudflare's Workers cache. The cache key includes the complete path and query string, so changes to `data`, `theme`, dimensions, or format use separate entries. Keep the query parameter order consistent when sharing a URL.
+
+Cache hits return the image without invoking the renderer or rate limiter. POST responses and errors are not cached. Cloudflare starts a new cache on deployment, and may evict entries before their freshness period ends.
+
+Every chart preview on this site uses the API with an explicit light or dark theme. Previews follow your device's color preference.
 
 ## Public limits and errors
 
-GET and POST share an allowance of 10 render requests per minute per IP address. Cloudflare's limiter is approximate and local to each location. Responses are not publicly cached by the renderer.
+Uncached GET renders and POST share an allowance of 10 render requests per minute per IP address. Cloudflare's limiter is approximate and local to each location. Cached GET images do not consume the allowance.
 
 The JSON payload limit is 1 MiB, measured after decoding. Encoded GET inputs are also bounded before parsing. Output dimensions are at most 2,000 × 2,000. The sum of all mark data arrays must not exceed 10,000 rows; two marks over the same 6,000 rows count as 12,000.
 
@@ -107,4 +115,4 @@ The JSON payload limit is 1 MiB, measured after decoding. Encoded GET inputs are
 | `429` | Rate limit exceeded | Wait before requesting another render |
 | `500` | A schema-valid definition could not render | Check mark options, field mappings, and scales |
 
-Dimension and row limits fail validation with `400`. Oversized input bytes return `413`. Errors are JSON with an `error` message. Download an image once and upload the file to your messaging platform; each new render URL request counts toward the allowance.
+Dimension and row limits fail validation with `400`. Oversized input bytes return `413`. Errors are JSON with an `error` message. Download the image and upload the file to your messaging platform, or reuse its URL. A new URL or a cache miss counts toward the render allowance.

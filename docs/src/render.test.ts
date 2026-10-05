@@ -59,6 +59,7 @@ describe('POST /', () => {
     expect(response.status).toBe(200);
     expect(response.headers.get('Content-Type')).toBe('image/png');
     expect(response.headers.get('Access-Control-Allow-Origin')).toBe('*');
+    expect(response.headers.get('Cache-Control')).toBe('no-store');
     expect(limiter.limit).toHaveBeenCalledWith({ key: '203.0.113.1' });
     const bytes = new Uint8Array(await response.arrayBuffer());
     expect([...bytes.subarray(0, 8)]).toEqual([137, 80, 78, 71, 13, 10, 26, 10]);
@@ -390,5 +391,22 @@ describe('GET /x', () => {
     expect(response.headers.get('Access-Control-Expose-Headers')).toBe('Retry-After');
     expect(limiter.limit).toHaveBeenNthCalledWith(1, { key: '203.0.113.1' });
     expect(limiter.limit).toHaveBeenNthCalledWith(2, { key: '203.0.113.1' });
+  });
+});
+
+describe('image caching', () => {
+  test.each(['png', 'svg', 'webp'])('successful GET %s images have a 30-day public TTL', async (format) => {
+    const response = await renderRequest(queryRequest({ definition }, { format }), allowedLimiter());
+    expect(response.status).toBe(200);
+    expect(response.headers.get('Cache-Control')).toBe('public, max-age=2592000');
+  });
+
+  test('invalid requests and rate-limit responses cannot enter a shared cache', async () => {
+    const invalid = await renderRequest(queryRequest({ definition }, { theme: 'invalid' }), allowedLimiter());
+    expect(invalid.status).toBe(400);
+    expect(invalid.headers.get('Cache-Control')).toBe('no-store');
+    const limited = await renderRequest(queryRequest({ definition }), { limit: async () => ({ success: false }) });
+    expect(limited.status).toBe(429);
+    expect(limited.headers.get('Cache-Control')).toBe('no-store');
   });
 });

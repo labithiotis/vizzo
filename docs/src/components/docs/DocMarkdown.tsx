@@ -1,5 +1,7 @@
 import { Markdown, type MarkdownComponents } from '@tanstack/markdown/react';
 import { Children, isValidElement, type ReactNode } from 'react';
+import { chartExamples } from '~/chartExamples';
+import { ChartImage } from '../ChartImage';
 import { DocCopy } from './DocCode';
 
 function codeText(children: ReactNode): string {
@@ -77,16 +79,20 @@ const components: MarkdownComponents = {
       {children}
     </ol>
   ),
-  img: ({ alt, ...props }) => (
-    <img
-      {...props}
-      alt={alt || ''}
-      className="my-6 aspect-video w-full rounded-xl border border-doc-rule bg-white object-contain dark:border-grid-dark"
-      loading="lazy"
-      width={960}
-      height={540}
-    />
-  ),
+  img: ({ alt, ...props }) => {
+    const example = chartExamples.find((item) => item.url === props.src);
+    if (example) return <ChartImage example={example} />;
+    return (
+      <img
+        {...props}
+        alt={alt || ''}
+        className="my-6 aspect-video w-full rounded-xl border border-doc-rule bg-white object-contain dark:border-grid-dark"
+        loading="lazy"
+        width={960}
+        height={540}
+      />
+    );
+  },
   blockquote: ({ children }) => (
     <blockquote className="my-6 border-plotter-blue border-l-2 pl-5">{children}</blockquote>
   ),

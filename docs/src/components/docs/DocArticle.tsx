@@ -1,6 +1,7 @@
 import { chartExamples, type DocPage, docPages } from '~/documentation';
 import { ChartSpecimen } from './ChartSpecimen';
 import { DocMarkdown } from './DocMarkdown';
+import { DocPageActions } from './DocPageActions';
 
 export function DocArticle({ page }: { page: DocPage }) {
   const next = docPages[docPages.findIndex((item) => item.slug === page.slug) + 1];
@@ -17,17 +18,7 @@ export function DocArticle({ page }: { page: DocPage }) {
           {page.title}
         </h1>
         <p className="mt-5 max-w-2xl text-doc-muted text-lg leading-8 dark:text-ink-dark/65">{page.description}</p>
-        <div className="mt-6 flex flex-wrap gap-x-5 gap-y-2 font-mono-display text-doc-muted text-xs dark:text-ink-dark/50">
-          <a href={`/docs/${page.slug || 'index'}.md`} className="underline underline-offset-4">
-            Markdown ↗
-          </a>
-          <a href="/llms-full.txt" className="underline underline-offset-4">
-            LLM docs ↗
-          </a>
-          <a href="/schema.json" className="underline underline-offset-4">
-            JSON Schema ↗
-          </a>
-        </div>
+        <DocPageActions key={page.slug} page={page} />
       </header>
       {quickstart && firstExample ? <ChartSpecimen example={firstExample} /> : null}
       {page.gallerySections ? <DocMarkdown text={page.gallerySections.intro} /> : null}

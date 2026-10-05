@@ -1,14 +1,17 @@
 import { useState } from 'react';
-import type { ChartExample } from '~/documentation';
+import type { ChartExample } from '~/chartExamples';
+import { ChartImage, useChartTheme } from '../ChartImage';
 import { DocCode } from './DocCode';
 
 const transports = ['URL', 'CLI', 'POST', 'JSON'];
 
 export function ChartSpecimen({ example, compact = false }: { example: ChartExample; compact?: boolean }) {
   const [transport, setTransport] = useState('URL');
+  const theme = useChartTheme();
+  const url = theme === 'dark' ? example.darkUrl : example.url;
   const text =
     transport === 'URL'
-      ? example.url
+      ? url
       : transport === 'CLI'
         ? example.command
         : transport === 'POST'
@@ -28,25 +31,21 @@ export function ChartSpecimen({ example, compact = false }: { example: ChartExam
         <span className="font-mono-display text-doc-muted text-xs dark:text-ink-dark/60">{example.mark}</span>
       </div>
       <a
-        href={example.url}
+        href={url}
         target="_blank"
         rel="noopener noreferrer"
         aria-label={`Open ${example.title} PNG in a new tab`}
-        className="block bg-white"
+        className="block"
       >
-        <img
-          src={`/docs/examples/${example.id}.svg`}
-          alt={`${example.title}, rendered by Vizzo`}
-          width={960}
-          height={540}
-          className="aspect-video w-full object-contain"
-          loading={compact ? 'lazy' : 'eager'}
-        />
+        <ChartImage example={example} loading={compact ? 'lazy' : 'eager'} />
       </a>
       <div className="space-y-4 border-doc-rule border-t p-5 dark:border-grid-dark">
         {compact ? (
           <p className="text-doc-muted text-sm leading-6 dark:text-ink-dark/65">{example.description}</p>
         ) : null}
+        <p className="text-doc-muted text-xs dark:text-ink-dark/60">
+          Rendered by the Vizzo API · follows your device theme
+        </p>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <fieldset className="flex gap-1">
             <legend className="sr-only">Example format</legend>
@@ -63,7 +62,7 @@ export function ChartSpecimen({ example, compact = false }: { example: ChartExam
             ))}
           </fieldset>
           <a
-            href={example.url}
+            href={url}
             target="_blank"
             rel="noopener noreferrer"
             className="text-plotter-blue text-xs underline-offset-4 hover:underline dark:text-blue-300"

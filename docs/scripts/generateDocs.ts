@@ -2,7 +2,6 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseMarkdown } from '@tanstack/markdown/parser';
-import { render } from '@vizzo/core';
 import { renderOptionsSchema } from '@vizzo/schemas';
 import { stringify } from 'jsurl2';
 import { z } from 'zod';
@@ -147,7 +146,8 @@ async function write(path: string, content: string) {
 
 export async function generateDocumentation() {
   const documentation = await createDocumentation();
-  await write('src/documentation.gen.json', `${JSON.stringify(documentation, null, 2)}\n`);
+  await write('src/documentation.gen.json', `${JSON.stringify({ pages: documentation.pages }, null, 2)}\n`);
+  await write('src/chartExamples.gen.json', `${JSON.stringify(documentation.examples, null, 2)}\n`);
   for (const page of documentation.pages) {
     const markdown = `# ${page.title}\n\n${page.description}\n\n${page.markdown}`;
     parseMarkdown(markdown);
@@ -155,9 +155,6 @@ export async function generateDocumentation() {
   }
   for (const example of documentation.examples) {
     await write(`public/docs/examples/${example.id}.json`, example.json);
-    const result = await render({ ...example.options, width: 960, height: 540, format: 'svg', theme: 'light' });
-    if (typeof result.data !== 'string') throw new Error(`Expected SVG for ${example.id}`);
-    await write(`public/docs/examples/${example.id}.svg`, result.data);
   }
   await write(
     'public/llms.txt',

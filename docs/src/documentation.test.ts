@@ -52,23 +52,25 @@ test('each editable JSURL2 URL returns the same image as its JSON definition', a
     );
     expect(post.status).toBe(200);
     expect(new Uint8Array(await post.arrayBuffer())).toEqual(new Uint8Array(rendered.data));
-  }
-});
-
-test('static previews are the renderer output and downloaded JSON contains the same chart', async () => {
-  for (const example of chartExamples) {
-    const raw = await readFile(resolve(docsDirectory, `public/docs/examples/${example.id}.json`), 'utf8');
-    expect<unknown>(renderOptionsSchema.parse(JSON.parse(raw))).toEqual(example.options);
-    const svg = await readFile(resolve(docsDirectory, `public/docs/examples/${example.id}.svg`), 'utf8');
-    const rendered = await render({
+    const dark = await renderRequest(new Request(example.darkUrl), { limit: async () => ({ success: true }) });
+    const darkRendered = await render({
       ...renderOptionsSchema.parse(example.options),
       width: 960,
       height: 540,
-      theme: 'light',
-      format: 'svg',
+      theme: 'dark',
+      format: 'png',
     });
-    if (typeof rendered.data !== 'string') throw new Error('Expected SVG text');
-    expect(svg).toBe(rendered.data);
+    if (typeof darkRendered.data === 'string') throw new Error('Expected PNG bytes');
+    expect(dark.status).toBe(200);
+    expect(new Uint8Array(await dark.arrayBuffer())).toEqual(new Uint8Array(darkRendered.data));
+    expect(darkRendered.data).not.toEqual(rendered.data);
+  }
+});
+
+test('downloaded JSON contains the same chart as its API URL', async () => {
+  for (const example of chartExamples) {
+    const raw = await readFile(resolve(docsDirectory, `public/docs/examples/${example.id}.json`), 'utf8');
+    expect<unknown>(renderOptionsSchema.parse(JSON.parse(raw))).toEqual(example.options);
     expect(example.post).not.toContain('\n+');
     expect(example.command).toContain(`${example.id}.json ${example.id}.png`);
   }

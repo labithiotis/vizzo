@@ -1,6 +1,6 @@
 ## Start from a working definition
 
-Every preview is a static SVG rendered by Vizzo. Opening a chart URL requests a PNG from the public renderer. Copy the JSURL2 URL and change values in the address bar, or download the JSON to render it locally.
+Every chart on this site is rendered by the Vizzo API. Previews use live image URLs with an explicit theme and follow your device's light or dark preference. GET images are cached for 30 days; cache hits do not consume your render allowance. Copy the JSURL2 URL and change values in the address bar, or download the JSON to render it locally.
 
 Use PNG for broad attachment support, WebP for smaller files when your destination accepts it, and SVG when you need scalable vector output. The renderer does not publish or send anything for you.
 
@@ -8,7 +8,7 @@ Use PNG for broad attachment support, WebP for smaller files when your destinati
 
 ## Line chart
 
-![Monthly revenue line chart](/docs/examples/line.svg)
+![Monthly revenue line chart]({{line.url}})
 
 [Download JSON](/docs/examples/line.json) · [Open editable chart URL]({{line.url}})
 
@@ -18,7 +18,7 @@ Use PNG for broad attachment support, WebP for smaller files when your destinati
 
 ## Multiple series
 
-![Downloads grouped by package](/docs/examples/multi-series.svg)
+![Downloads grouped by package]({{multi-series.url}})
 
 The `z` field groups the line paths. The `color` field gives each package a color and legend entry.
 
@@ -30,7 +30,7 @@ The `z` field groups the line paths. The `color` field gives each package a colo
 
 ## Bar chart
 
-![Letter frequencies as bars](/docs/examples/bar.svg)
+![Letter frequencies as bars]({{bar.url}})
 
 The `band` scale provides space for each category. For a horizontal comparison, change `barY` to `barX`, exchange the x/y field mappings, and put the band scale on y and the linear scale on x.
 
@@ -42,7 +42,7 @@ The `band` scale provides space for each category. For a horizontal comparison, 
 
 ## Layered area and line
 
-![Weekly active users with area and line marks](/docs/examples/area.svg)
+![Weekly active users with area and line marks]({{area.url}})
 
 The same data feeds an `areaY` mark and a `lineY` mark. This uses the normal `marks` array, without a special combined chart type.
 
@@ -54,7 +54,7 @@ The same data feeds an `areaY` mark and a `lineY` mark. This uses the normal `ma
 
 ## UTC time series
 
-![Monthly signups over a UTC date axis](/docs/examples/time-series.svg)
+![Monthly signups over a UTC date axis]({{time-series.url}})
 
 Use ISO date strings with `"scale": "utc"`. Vizzo hydrates the date values for TanStack's UTC scale.
 
@@ -66,7 +66,7 @@ Use ISO date strings with `"scale": "utc"`. Vizzo hydrates the date values for T
 
 ## Pie chart
 
-![Letter frequency proportions as a pie chart](/docs/examples/pie.svg)
+![Letter frequency proportions as a pie chart]({{pie.url}})
 
 The `value` option defines the slice size. Set `innerRadius` above zero for a donut.
 

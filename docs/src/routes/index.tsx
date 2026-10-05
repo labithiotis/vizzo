@@ -40,6 +40,9 @@ function Home() {
             Browse chart gallery →
           </Link>
         </div>
+        <p className="mt-3 text-ink/60 text-sm dark:text-ink-dark/60">
+          Every chart on this site is rendered by the Vizzo API.
+        </p>
         <div className="mt-6">
           <ExampleGallery />
         </div>
