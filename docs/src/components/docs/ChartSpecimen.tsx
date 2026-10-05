@@ -71,6 +71,7 @@ export function ChartSpecimen({ example, compact = false }: { example: ChartExam
           </a>
         </div>
         <DocCode
+          key={transport}
           text={text}
           label={
             transport === 'URL'

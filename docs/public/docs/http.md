@@ -50,7 +50,7 @@ const data = Buffer.from(JSON.stringify(envelope), 'utf8').toString('base64url')
 const base64 = `https://vizzo.dev/x?data=${data}`;
 ```
 
-Standard base64 also works. Encode it with `URLSearchParams` so `+` does not become a space. Base64 hides the chart structure and is not compression. JSON without whitespace is smaller than pretty-printed JSON for every encoding.
+Standard base64 also works. Encode it with `URLSearchParams` so `+` does not become a space. Base64 hides the chart structure and is not compression. Minify JSON before encoding raw JSON or base64. JSURL2 already serializes an object without JSON formatting whitespace.
 
 ## Send JSON with POST
 
@@ -105,5 +105,6 @@ The JSON payload limit is 1 MiB, measured after decoding. Encoded GET inputs are
 | `413` | Request data is too large | Reduce input size or row count; POST still has the 1 MiB body limit |
 | `415` | Unsupported POST content type | Set `Content-Type: application/json` |
 | `429` | Rate limit exceeded | Wait before requesting another render |
+| `500` | A schema-valid definition could not render | Check mark options, field mappings, and scales |
 
 Dimension and row limits fail validation with `400`. Oversized input bytes return `413`. Errors are JSON with an `error` message. Download an image once and upload the file to your messaging platform; each new render URL request counts toward the allowance.

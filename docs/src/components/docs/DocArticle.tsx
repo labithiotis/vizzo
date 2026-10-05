@@ -30,6 +30,7 @@ export function DocArticle({ page }: { page: DocPage }) {
         </div>
       </header>
       {quickstart && firstExample ? <ChartSpecimen example={firstExample} /> : null}
+      {page.gallerySections ? <DocMarkdown text={page.gallerySections.intro} /> : null}
       {gallery ? (
         <div className="grid gap-6 xl:grid-cols-2">
           {chartExamples.map((example) => (
@@ -40,13 +41,14 @@ export function DocArticle({ page }: { page: DocPage }) {
       {gallery ? (
         <details className="mt-10 rounded-xl border border-doc-rule px-5 py-4 dark:border-grid-dark">
           <summary className="cursor-pointer font-medium">Example notes and sharing commands</summary>
-          <DocMarkdown text={page.markdown} />
+          <DocMarkdown text={page.gallerySections?.notes || ''} />
         </details>
       ) : (
         <div className="max-w-3xl">
           <DocMarkdown text={page.markdown} />
         </div>
       )}
+      {page.gallerySections ? <DocMarkdown text={page.gallerySections.sharing} /> : null}
       <footer className="mt-12 flex flex-wrap items-center justify-between gap-6 border-doc-rule border-t pt-7 dark:border-grid-dark">
         <p className="font-mono-display text-doc-muted text-xs dark:text-ink-dark/50">
           TanStack Charts in. SVG, PNG, or WebP out.

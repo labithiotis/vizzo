@@ -132,7 +132,8 @@ export async function createDocumentation() {
         return example.post;
       });
       if (markdown.includes('{{')) throw new Error(`Unexpanded placeholder in ${guide.file}`);
-      return { ...guide, markdown };
+      const [intro = '', notes = '', sharing = ''] = markdown.split(/<!-- (?:examples|sharing) -->/);
+      return { ...guide, markdown, gallerySections: guide.slug === 'examples' ? { intro, notes, sharing } : null };
     }),
   );
   return { pages, examples };

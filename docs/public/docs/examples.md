@@ -8,6 +8,8 @@ Every preview is a static SVG rendered by Vizzo. Opening a chart URL requests a 
 
 Use PNG for broad attachment support, WebP for smaller files when your destination accepts it, and SVG when you need scalable vector output. The renderer does not publish or send anything for you.
 
+<!-- examples -->
+
 ## Line chart
 
 ![Monthly revenue line chart](/docs/examples/line.svg)
@@ -77,6 +79,8 @@ The `value` option defines the slice size. Set `innerRadius` above zero for a do
 ```sh
 npx vizzo pie.json pie.png --theme light
 ```
+
+<!-- sharing -->
 
 ## Send a report to a conversation
 
