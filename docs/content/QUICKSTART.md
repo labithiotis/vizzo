@@ -14,7 +14,7 @@ Download [line.json](/docs/examples/line.json), or save this envelope as `line.j
 
 ## Render a file with the CLI
 
-No global installation is required. Use Node with `npx`, or run the same command with `bunx vizzo` or `pnpm dlx vizzo`.
+No global installation is required. Use Node with `npx` or `pnpm dlx vizzo`. With Bun, use `bunx --bun vizzo` to run without Node installed.
 
 ```sh
 {{line.command}}

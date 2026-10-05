@@ -2,7 +2,7 @@
 
 One command for a local chart. The same command for a scheduled report, a bot, or a CI job.
 
-## Run it anywhere Node runs
+## Run with Node or Bun
 
 ```sh
 npx vizzo --help
@@ -10,7 +10,13 @@ npm install --global vizzo
 vizzo line.json line.png
 ```
 
-The published package works with Node. Bun and pnpm also work through `bunx vizzo` and `pnpm dlx vizzo`. Rendering uses TanStack Charts and Resvg directly. There is no browser or Canvas dependency.
+With Bun, run the CLI without installing Node:
+
+```sh
+bunx --bun vizzo line.json line.png
+```
+
+`--bun` runs the CLI with Bun despite its Node shebang. `pnpm dlx vizzo` runs it with Node. Rendering uses TanStack Charts and Resvg directly, with no browser or Canvas dependency.
 
 ## Choose your input
 
