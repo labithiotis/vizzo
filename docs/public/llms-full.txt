@@ -586,7 +586,7 @@ Presets only choose dimensions. Attach the result to your post, message, or emai
 
 ## Definition fields
 
-`marks` is required and contains at least one mark. Other definition fields are `x`, `y`, `color`, `margin`, `clip`, `frame`, and `theme`. `margin` accepts a number or an object such as `{ "top": 24, "right": 24, "bottom": 48, "left": 64 }`.
+`marks` is required and contains at least one mark. Other definition fields are `x`, `y`, `color`, `margin`, `clip`, `guides`, and `theme`. `margin` accepts a number or an object such as `{ "top": 24, "right": 24, "bottom": 48, "left": 64 }`.
 
 See [chart definitions](/docs/chart-definitions) for supported marks/scales and the JSON-to-TanStack mapping. See [HTTP limits](/docs/http#public-limits-and-errors) for the public endpoint's validation and rate limits.
 
