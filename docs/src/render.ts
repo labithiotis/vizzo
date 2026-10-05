@@ -1,12 +1,14 @@
 import { defaultParseSearch } from '@tanstack/react-router';
 import { render } from '@vizzo/core';
 import { renderOptionsSchema } from '@vizzo/schemas';
+import { parse } from 'jsurl2';
 import { z } from 'zod';
 
 const MAX_BODY_BYTES = 1024 * 1024;
 const MAX_DIMENSION = 2000;
 const MAX_DATA_ROWS = 10_000;
 const CORS_HEADERS = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Expose-Headers': 'Retry-After' };
+const BASE64 = /^[A-Za-z\d+/_-]+={0,2}$/;
 
 const apiOptionsSchema = renderOptionsSchema
   .extend({
@@ -53,14 +55,46 @@ async function readBody(request: Request) {
   }
 }
 
+function readQueryOptions(url: URL) {
+  const data = url.searchParams.getAll('data').join('');
+  const jsurl = data.startsWith('(');
+  const base64 = BASE64.test(data);
+  const maxBytes = jsurl ? MAX_BODY_BYTES * 2 : base64 ? Math.ceil(MAX_BODY_BYTES / 3) * 4 : MAX_BODY_BYTES;
+  if (new TextEncoder().encode(data).byteLength > maxBytes) {
+    return errorResponse('Request data must not exceed 1 MiB.', 413);
+  }
+  const query: Record<string, unknown> = defaultParseSearch(url.search);
+  if (typeof query.data === 'string' && query.data === data && (jsurl || base64)) {
+    const decoded = decodeData(data, jsurl);
+    if (decoded instanceof Response) return decoded;
+    query.data = decoded;
+  }
+  return apiQuerySchema.safeParse(query);
+}
+
+function decodeData(data: string, jsurl: boolean) {
+  try {
+    if (jsurl) {
+      const decoded = parse<unknown>(data);
+      const json = JSON.stringify(decoded);
+      if (new TextEncoder().encode(json).byteLength > MAX_BODY_BYTES) {
+        return errorResponse('Request data must not exceed 1 MiB.', 413);
+      }
+      return decoded;
+    }
+    const bytes = Uint8Array.from(atob(data.replace(/-/g, '+').replace(/_/g, '/')), (character) =>
+      character.charCodeAt(0),
+    );
+    if (bytes.byteLength > MAX_BODY_BYTES) return errorResponse('Request data must not exceed 1 MiB.', 413);
+    return JSON.parse(new TextDecoder('utf-8', { fatal: true }).decode(bytes));
+  } catch {
+    return errorResponse('Request data must be valid JSON, base64-encoded JSON, or JSURL2.', 400);
+  }
+}
+
 async function readOptions(request: Request) {
   if (request.method === 'GET' || request.method === 'HEAD') {
-    const url = new URL(request.url);
-    const data = url.searchParams.getAll('data').join('');
-    if (new TextEncoder().encode(data).byteLength > MAX_BODY_BYTES) {
-      return errorResponse('Request data must not exceed 1 MiB.', 413);
-    }
-    return apiQuerySchema.safeParse(defaultParseSearch(url.search));
+    return readQueryOptions(new URL(request.url));
   }
   if (request.headers.get('Content-Type')?.split(';')[0]?.trim().toLowerCase() !== 'application/json') {
     return errorResponse('Content-Type must be application/json.', 415);

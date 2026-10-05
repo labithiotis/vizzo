@@ -1,5 +1,6 @@
 import { describe, expect, mock, test } from 'bun:test';
 import { render } from '@vizzo/core';
+import { stringify } from 'jsurl2';
 import { renderRequest } from './render';
 
 const definition = {
@@ -33,6 +34,23 @@ function queryRequest(body: unknown, options: Record<string, string> = {}) {
   const query = new URLSearchParams({ data: typeof body === 'string' ? body : JSON.stringify(body), ...options });
   return new Request(`https://vizzo.dev/x?${query}`, { headers: { 'CF-Connecting-IP': '203.0.113.1' } });
 }
+
+const encodings = [
+  { name: 'raw JSON', encode: JSON.stringify },
+  { name: 'base64', encode: (body: unknown) => Buffer.from(JSON.stringify(body)).toString('base64') },
+  {
+    name: 'unpadded base64',
+    encode: (body: unknown) => Buffer.from(JSON.stringify(body)).toString('base64').replace(/=+$/, ''),
+  },
+  { name: 'base64url', encode: (body: unknown) => Buffer.from(JSON.stringify(body)).toString('base64url') },
+  {
+    name: 'padded base64url',
+    encode: (body: unknown) =>
+      Buffer.from(JSON.stringify(body)).toString('base64').replace(/\+/g, '-').replace(/\//g, '_'),
+  },
+  { name: 'JSURL2', encode: stringify },
+  { name: 'short JSURL2', encode: (body: unknown) => stringify(body, { short: true }) },
+];
 
 describe('POST /', () => {
   test('defaults to PNG and uses the connecting IP for the rate limit', async () => {
@@ -126,6 +144,106 @@ describe('POST /', () => {
 });
 
 describe('GET /x', () => {
+  test.each(encodings)('renders $name with the same bytes as POST and preserves Unicode', async ({ encode }) => {
+    const input = {
+      definition: { ...definition, x: { ...definition.x, label: 'Café 💡 & + / = # ~ (_) * \n' } },
+      format: 'png',
+      width: 240,
+      height: 160,
+      theme: 'dark',
+      background: '#0f172a',
+    };
+    const get = await renderRequest(queryRequest(encode(input)), allowedLimiter());
+    const post = await renderRequest(request(input), allowedLimiter());
+    expect(get.status).toBe(200);
+    expect(get.headers.get('Content-Type')).toBe('image/png');
+    expect(new Uint8Array(await get.arrayBuffer())).toEqual(new Uint8Array(await post.arrayBuffer()));
+  });
+
+  test.each(encodings)('applies query overrides before shared validation for $name', async ({ encode }) => {
+    const input = { definition, width: 'invalid', height: -1, format: 'jpeg' };
+    const response = await renderRequest(
+      queryRequest(encode(input), { width: '200', height: '120', format: 'svg' }),
+      allowedLimiter(),
+    );
+    expect(response.status).toBe(200);
+    expect(await response.text()).toContain('viewBox="0 0 200 120"');
+  });
+
+  test.each(encodings)('rejects duplicated $name data without choosing an encoding', async ({ encode }) => {
+    const url = new URL(queryRequest(encode({ definition })).url);
+    url.searchParams.append('data', url.searchParams.get('data') ?? '');
+    const response = await renderRequest(new Request(url), allowedLimiter());
+    expect(response.status).toBe(400);
+    expect(await response.json()).toHaveProperty('issues');
+  });
+
+  test.each(encodings)('supports $name in TanStack HEAD fallback', async ({ encode }) => {
+    const head = new Request(queryRequest(encode({ definition, format: 'svg', width: 200, height: 120 })), {
+      method: 'HEAD',
+    });
+    const response = await renderRequest(head, allowedLimiter());
+    expect(response.status).toBe(200);
+    expect(response.headers.get('Content-Type')).toBe('image/svg+xml');
+    expect(await response.text()).toContain('viewBox="0 0 200 120"');
+  });
+
+  test.each(encodings)('rejects values outside the render envelope in $name', async ({ encode }) => {
+    for (const input of [null, [], 1, 'text', {}, definition, { definition, width: '200' }]) {
+      const response = await renderRequest(queryRequest(encode(input)), allowedLimiter());
+      expect(response.status).toBe(400);
+    }
+  });
+
+  test('supports editable JSURL2 directly in a URL without escaping its delimiters', async () => {
+    const input = { definition, format: 'svg', width: 200, height: 120 };
+    const response = await renderRequest(new Request(`https://vizzo.dev/x?data=${stringify(input)}`), allowedLimiter());
+    expect(response.status).toBe(200);
+    expect(await response.text()).toContain('viewBox="0 0 200 120"');
+  });
+
+  test.each(['(definition~*?', '(definition~_Unknown)', '////', 'ew==', 'abc=', 'bad===', '💡'])(
+    'rejects malformed codec data: %j',
+    async (data) => {
+      const response = await renderRequest(queryRequest(data), allowedLimiter());
+      expect(response.status).toBe(400);
+    },
+  );
+
+  test('bounds decoded base64 JSON bytes without rejecting encoding overhead', async () => {
+    const json = JSON.stringify({ definition, format: 'svg' });
+    const body = json + ' '.repeat(1024 * 1024 - json.length);
+    const accepted = await renderRequest(queryRequest(Buffer.from(body).toString('base64')), allowedLimiter());
+    expect(accepted.status).toBe(200);
+    const rejected = await renderRequest(queryRequest(Buffer.from(`${body} `).toString('base64')), allowedLimiter());
+    expect(rejected.status).toBe(413);
+  });
+
+  test('bounds decoded JSURL2 JSON bytes without rejecting escaping overhead', async () => {
+    const input = { definition, format: 'svg', background: '' };
+    input.background = '#'.repeat(1024 * 1024 - JSON.stringify(input).length);
+    const accepted = await renderRequest(queryRequest(stringify(input)), allowedLimiter());
+    expect(accepted.status).toBe(200);
+    const rejected = await renderRequest(
+      queryRequest(stringify({ ...input, background: `${input.background}#` })),
+      allowedLimiter(),
+    );
+    expect(rejected.status).toBe(413);
+  });
+
+  test.each(encodings)('rejects quoted JSON strings containing $name envelopes', async ({ encode }) => {
+    const response = await renderRequest(queryRequest(JSON.stringify(encode({ definition }))), allowedLimiter());
+    expect(response.status).toBe(400);
+  });
+
+  test.each(['A'.repeat(Math.ceil((1024 * 1024) / 3) * 4 + 1), `(${'A'.repeat(1024 * 1024 * 2)}`])(
+    'bounds encoded data before decoding',
+    async (data) => {
+      const response = await renderRequest(queryRequest(data), allowedLimiter());
+      expect(response.status).toBe(413);
+    },
+  );
+
   test('parses query options for the TanStack HEAD fallback', async () => {
     const head = new Request(queryRequest({ definition }, { width: '200', height: '120', format: 'svg' }), {
       method: 'HEAD',

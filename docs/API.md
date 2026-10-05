@@ -58,12 +58,35 @@ not cached. Browser requests use public CORS. JSON POST requests use
 
 ## Render from a URL
 
-Send `GET https://vizzo.dev/x?width=200&data=<URL-encoded JSON>`. The required
-`data` parameter contains the same JSON envelope as the POST body, including
-`definition`. Optional `width`, `height`, `format`, `theme`, `preset`, and
+Send `GET https://vizzo.dev/x?width=200&data=<chart>`. The required `data`
+parameter accepts raw JSON, UTF-8 JSON encoded as base64, or
+[JSURL2](https://github.com/wmertens/jsurl2). Each encoding represents the same
+JSON envelope as the POST body, including `definition`. Optional `width`, `height`, `format`, `theme`, `preset`, and
 `background` query parameters override values in that JSON. PNG is the default.
 Unknown query parameters are rejected.
-Query values use TanStack's JSON-first parsing; repeated scalar parameters are rejected.
+Query options use TanStack's JSON-first parsing; repeated scalar parameters are rejected.
+
+JSURL2 keeps the chart's keys and values readable in the URL. This example
+renders a line chart; edit the numbers after `data~` to change its points:
+
+```text
+https://vizzo.dev/x?width=600&height=320&data=(definition~(marks~!(type~lineY~data~!!1~2~~!2~5~~!3~3~~!4~7~~~options~(x~*0~y~*1))~x~(scale~linear)y~(scale~linear~grid)))~
+```
+
+Generate JSURL2 from a render envelope with `jsurl2`:
+
+```js
+import { stringify } from 'jsurl2';
+
+const imageUrl = `https://vizzo.dev/x?width=600&data=${stringify(options)}`;
+```
+
+JSURL2 escapes query delimiters itself, so concatenate its output directly to
+keep `~` and parentheses visible. Its `short: true` output is also supported.
+Browsers encode Unicode characters when sending the URL. JSURL2 changes only
+the transport encoding; the chart still uses TanStack Charts' mark and scale names.
+
+Raw JSON remains available:
 
 ```sh
 curl --get https://vizzo.dev/x \
@@ -72,7 +95,8 @@ curl --get https://vizzo.dev/x \
   -o chart.png
 ```
 
-Use `URLSearchParams` in JavaScript to encode JSON, including characters such as
+Use `JSON.stringify` to remove unnecessary whitespace and `URLSearchParams` to
+encode JSON, including characters such as
 `&`, `+`, and `#`:
 
 ```js
@@ -80,16 +104,29 @@ const query = new URLSearchParams({ width: '200', data: JSON.stringify(options) 
 const imageUrl = `https://vizzo.dev/x?${query}`;
 ```
 
+For base64, encode the UTF-8 JSON rather than a JSURL2 string. Standard and
+URL-safe base64 are supported, with or without valid padding. URL-safe base64
+avoids `+` characters being interpreted as spaces. In Node or Bun:
+
+```js
+const data = Buffer.from(JSON.stringify(options), 'utf8').toString('base64url');
+const imageUrl = `https://vizzo.dev/x?width=600&data=${data}`;
+```
+
+Pass standard base64 through `URLSearchParams` to escape its `+` characters.
+Base64 makes the URL opaque and is not encryption.
+
 GET uses the same validation, CORS headers, rendering limits, and IP rate limit as
 POST. Missing or malformed `data` returns 400. Large charts should use POST;
 browsers and Cloudflare impose URL length limits before the Worker receives the
-request.
+request. The 1 MiB limit applies to decoded UTF-8 JSON; encoded data is also
+bounded before parsing, allowing for base64 and JSURL2 escaping overhead.
 
 Errors have a JSON `error` string. Validation errors also include Zod `issues`.
 
 | Status | Meaning |
 | --- | --- |
-| `400` | Invalid JSON, options, dimensions, or data row count. |
+| `400` | Invalid JSON, base64, JSURL2, options, dimensions, or data row count. |
 | `413` | Request body or decoded GET data exceeds 1 MiB. |
 | `415` | POST content type is not `application/json`. |
 | `429` | Rate limit exceeded; `Retry-After: 60` advises when to retry. |
