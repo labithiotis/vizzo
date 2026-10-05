@@ -1,6 +1,9 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { createThemeCss, createThemeRule } from '@tanstack/highlight/theme';
+import { githubDarkTheme } from '@tanstack/highlight/themes/github-dark';
+import { githubLightTheme } from '@tanstack/highlight/themes/github-light';
 import { parseMarkdown } from '@tanstack/markdown/parser';
 import { renderOptionsSchema } from '@vizzo/schemas';
 import { stringify } from 'jsurl2';
@@ -145,6 +148,10 @@ async function write(path: string, content: string) {
 }
 
 export async function generateDocumentation() {
+  await write(
+    'src/highlight.gen.css',
+    `${createThemeCss({ light: githubLightTheme, codeBlockSelector: 'pre.docs-code' })}\n\n@media (prefers-color-scheme: dark) {\n${createThemeRule(':root', githubDarkTheme)}\n}\n`,
+  );
   const documentation = await createDocumentation();
   await write('src/documentation.gen.json', `${JSON.stringify({ pages: documentation.pages }, null, 2)}\n`);
   await write('src/chartExamples.gen.json', `${JSON.stringify(documentation.examples, null, 2)}\n`);

@@ -4,6 +4,7 @@ import { ChartImage, useChartTheme } from '../ChartImage';
 import { DocCode } from './DocCode';
 
 const transports = ['URL', 'CLI', 'POST', 'JSON'];
+const codeLanguages: Record<string, string> = { URL: 'text', CLI: 'sh', POST: 'sh', JSON: 'json' };
 
 export function ChartSpecimen({ example, compact = false }: { example: ChartExample; compact?: boolean }) {
   const [transport, setTransport] = useState('URL');
@@ -83,6 +84,7 @@ export function ChartSpecimen({ example, compact = false }: { example: ChartExam
                   : 'HTTP POST'
           }
           wrap={transport === 'URL'}
+          language={codeLanguages[transport]}
         />
         <a
           href={`/docs/examples/${example.id}.json`}

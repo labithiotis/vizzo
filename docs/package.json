@@ -13,9 +13,10 @@
     "format": "biome check --write .",
     "test": "bun test",
     "typecheck": "tsc --noEmit",
-    "generate": "bun scripts/generateDocs.ts && biome format --write public/schema.json"
+    "generate": "bun scripts/generateDocs.ts && biome format --write public/schema.json src/highlight.gen.css"
   },
   "dependencies": {
+    "@tanstack/highlight": "1.0.0",
     "@tanstack/markdown": "1.0.0",
     "@tanstack/react-router": "1.170.32",
     "@tanstack/react-start": "1.168.49",
