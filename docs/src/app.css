@@ -56,8 +56,8 @@
 }
 
 .vizzo-trace {
-  stroke-dasharray: 320;
-  stroke-dashoffset: 320;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
   animation: vizzo-draw 1.6s ease-out 0.2s forwards;
 }
 

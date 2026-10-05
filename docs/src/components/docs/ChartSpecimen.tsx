@@ -16,8 +16,9 @@ export function ChartSpecimen({ example, compact = false }: { example: ChartExam
           : example.json.trimEnd();
   return (
     <section
+      id={example.id}
       aria-label={`${example.title} example`}
-      className="overflow-hidden rounded-2xl border border-doc-rule bg-doc-sheet dark:border-grid-dark dark:bg-paper-dark"
+      className="scroll-mt-24 overflow-hidden rounded-2xl border border-doc-rule bg-doc-sheet dark:border-grid-dark dark:bg-paper-dark"
     >
       <div className="flex items-center justify-between gap-3 border-doc-rule border-b px-5 py-3 dark:border-grid-dark">
         <div className="flex items-center gap-2.5">

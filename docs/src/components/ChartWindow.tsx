@@ -58,22 +58,22 @@ export function ChartWindow() {
             );
           })}
           <polyline
+            pathLength={1}
             points={toPolyline(costs)}
             fill="none"
             strokeWidth="1.5"
             strokeLinecap="round"
             strokeLinejoin="round"
-            vectorEffect="non-scaling-stroke"
             className="vizzo-trace stroke-plotter-green"
             style={{ animationDelay: '0.5s' }}
           />
           <polyline
+            pathLength={1}
             points={toPolyline(revenue)}
             fill="none"
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
-            vectorEffect="non-scaling-stroke"
             className="vizzo-trace stroke-plotter-blue"
           />
           {revenueEnd ? (

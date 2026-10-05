@@ -1,5 +1,5 @@
 const FEATURES = [
-  'Grammar of Graphics',
+  'TanStack Charts',
   'No browser',
   'No Playwright',
   'No Canvas',
@@ -23,7 +23,7 @@ export function FeatureList() {
           >
             ✓
           </span>
-          <span className="font-mono-display text-sm">{feature}</span>
+          <span className="wrap-break-word min-w-0 font-mono-display text-sm">{feature}</span>
         </li>
       ))}
     </ul>
