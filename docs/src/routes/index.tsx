@@ -93,7 +93,7 @@ function Home() {
                 Read the docs →
               </a>
               <a
-                href="https://github.com/vizzo/vizzo"
+                href="https://github.com/labithiotis/vizzo"
                 className="flex items-center gap-2 rounded-md bg-ink px-4 py-2.5 font-mono-display text-paper text-xs uppercase tracking-wide transition hover:opacity-85 dark:bg-paper dark:text-ink"
               >
                 <GithubMark className="size-3.5" />
@@ -148,7 +148,7 @@ function Home() {
       <footer className="mx-auto max-w-6xl border-grid p-6 dark:border-grid-dark">
         <p className="font-mono-display text-ink/50 text-xs dark:text-ink-dark/50">
           MIT licensed.{' '}
-          <a href="https://github.com/vizzo/vizzo" className="text-plotter-blue underline underline-offset-4">
+          <a href="https://github.com/labithiotis/vizzo" className="text-plotter-blue underline underline-offset-4">
             GitHub
           </a>
         </p>
