@@ -7,18 +7,22 @@ export function HomeHero() {
     <div className="relative isolate overflow-hidden">
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute top-[-12rem] left-[-8rem] -z-10 size-[28rem] rounded-full bg-plotter-blue/20 blur-[100px] dark:bg-plotter-blue/25"
+        className="landing-glow pointer-events-none absolute top-[-12rem] left-[-8rem] -z-10 size-[28rem] rounded-full bg-plotter-blue/20 blur-[100px] dark:bg-plotter-blue/25"
       />
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute top-[-6rem] right-[-10rem] -z-10 size-[26rem] rounded-full bg-plotter-red/15 blur-[110px] dark:bg-plotter-red/20"
+        className="landing-glow pointer-events-none absolute top-[-6rem] right-[-10rem] -z-10 size-[26rem] rounded-full bg-plotter-red/15 blur-[110px] dark:bg-plotter-red/20"
+        style={{ animationDelay: '70ms' }}
       />
       <header className="mx-auto grid max-w-6xl gap-12 px-6 pt-20 pb-20 sm:pt-28 sm:pb-28 lg:grid-cols-[1.1fr_1fr] lg:items-center">
         <div>
           <p className="vizzo-rise font-mono-display text-plotter-blue text-xs uppercase tracking-widest">
             SVG · PNG · WebP
           </p>
-          <h1 className="vizzo-rise mt-5 max-w-xl font-mono-display text-5xl leading-[1.02] tracking-tighter sm:text-7xl">
+          <h1
+            className="vizzo-rise mt-5 max-w-xl font-mono-display text-5xl leading-[1.02] tracking-tighter sm:text-7xl"
+            data-enter-delay="50"
+          >
             Render charts,
             <br />
             <span className="relative inline-block text-plotter-blue">
@@ -28,28 +32,36 @@ export function HomeHero() {
           </h1>
           <p
             className="vizzo-rise mt-8 max-w-lg text-ink/70 text-lg leading-relaxed dark:text-ink-dark/70"
-            style={{ animationDelay: '0.1s' }}
+            data-enter-delay="100"
           >
             Turn a TanStack Charts definition into an image with a URL, the CLI, or your code. Share charts in Slack,
             Discord, tweets, and email.
           </p>
-          <div className="vizzo-rise mt-9 flex flex-wrap gap-4" style={{ animationDelay: '0.2s' }}>
+          <div className="mt-9 flex flex-wrap gap-4">
             <Link
               to="/docs"
-              className="rounded-md bg-plotter-blue px-4 py-2.5 font-mono-display text-white text-xs uppercase tracking-wide hover:opacity-85"
+              className="landing-control vizzo-rise inline-flex items-center gap-2 rounded-md bg-plotter-blue px-4 py-2.5 font-mono-display text-white text-xs uppercase tracking-wide hover:opacity-85"
+              data-enter-delay="150"
             >
-              Read docs →
+              Read docs{' '}
+              <span aria-hidden="true" className="landing-arrow">
+                →
+              </span>
             </Link>
             <Link
               to="/docs/$page"
               params={{ page: 'examples' }}
-              className="rounded-md border border-grid px-4 py-2.5 font-mono-display text-ink text-xs uppercase tracking-wide hover:border-plotter-blue dark:border-grid-dark dark:text-ink-dark"
+              className="landing-control vizzo-rise inline-flex items-center gap-2 rounded-md border border-grid px-4 py-2.5 font-mono-display text-ink text-xs uppercase tracking-wide hover:border-plotter-blue dark:border-grid-dark dark:text-ink-dark"
+              data-enter-delay="200"
             >
-              Explore charts →
+              Explore charts{' '}
+              <span aria-hidden="true" className="landing-arrow">
+                →
+              </span>
             </Link>
           </div>
         </div>
-        <div className="vizzo-rise" style={{ animationDelay: '0.15s' }}>
+        <div className="vizzo-rise" data-enter-delay="250">
           <ChartWindow />
         </div>
       </header>

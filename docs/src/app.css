@@ -19,15 +19,24 @@
 
   --font-mono-display: "JetBrains Mono", ui-monospace, monospace;
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+}
+
+:root {
+  --motion-quick: 140ms;
+  --motion-standard: 200ms;
+  --motion-enter: 500ms;
 }
 
 .docs-feedback {
-  transition: opacity 140ms cubic-bezier(0.23, 1, 0.32, 1);
+  transition: opacity var(--motion-quick) var(--ease-out);
 }
 
 @media (hover: hover) and (pointer: fine) {
   .docs-press {
-    transition: transform 140ms cubic-bezier(0.23, 1, 0.32, 1);
+    transition: transform var(--motion-quick) var(--ease-out);
   }
   .docs-press:active:not(:focus-visible) {
     transform: scale(0.97);
@@ -56,39 +65,148 @@
 }
 
 .vizzo-squiggle {
-  stroke-dasharray: 1;
-  stroke-dashoffset: 1;
-  animation: vizzo-squiggle-draw 0.5s ease-out 0.8s forwards;
+  animation: vizzo-squiggle-draw var(--motion-enter) var(--ease-out) 500ms backwards;
 }
 
 @keyframes vizzo-squiggle-draw {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
   to {
-    stroke-dashoffset: 0;
+    clip-path: inset(0);
   }
 }
 
 .vizzo-rise {
-  opacity: 0;
-  transform: translateY(12px);
-  animation: vizzo-rise-in 0.5s ease-out forwards;
+  animation: vizzo-rise-in var(--motion-enter) var(--ease-out) backwards;
+}
+
+.vizzo-rise[data-enter-delay="50"] {
+  animation-delay: 50ms;
+}
+
+.vizzo-rise[data-enter-delay="100"] {
+  animation-delay: 100ms;
+}
+
+.vizzo-rise[data-enter-delay="150"] {
+  animation-delay: 150ms;
+}
+
+.vizzo-rise[data-enter-delay="200"] {
+  animation-delay: 200ms;
+}
+
+.vizzo-rise[data-enter-delay="250"] {
+  animation-delay: 250ms;
+}
+
+.vizzo-rise[data-enter-delay="350"] {
+  animation-delay: 350ms;
 }
 
 @keyframes vizzo-rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .vizzo-squiggle {
-    animation: none;
-    stroke-dashoffset: 0;
+.landing-glow {
+  animation: landing-glow-settle 4000ms var(--ease-in-out) backwards;
+}
+
+@keyframes landing-glow-settle {
+  from {
+    opacity: 0.8;
+    transform: translateY(-3px) scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.landing-window-dots span {
+  animation: vizzo-rise-in var(--motion-standard) var(--ease-out) 250ms backwards;
+}
+
+.landing-window-dots span:nth-child(2) {
+  animation-delay: 320ms;
+}
+
+.landing-window-dots span:nth-child(3) {
+  animation-delay: 390ms;
+}
+
+.landing-control,
+.landing-card,
+.landing-arrow,
+.landing-feature-icon {
+  transition: transform var(--motion-quick) var(--ease-out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .landing-card:hover {
+    border-color: var(--color-plotter-blue);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .landing-control:active:not(:focus-visible),
+  a.landing-card:active:not(:focus-visible) {
+    transform: scale(0.97);
   }
 
-  .vizzo-rise {
-    animation: none;
+  @media (hover: hover) and (pointer: fine) {
+    .landing-control:hover:not(:active):not(:focus-visible),
+    .landing-card:hover:not(:active):not(:focus-visible) {
+      transform: translateY(-2px);
+    }
+
+    .landing-control:hover .landing-arrow,
+    .landing-card:hover .landing-arrow {
+      transform: translateX(3px);
+    }
+
+    .landing-card:hover .landing-feature-icon {
+      transform: rotate(-5deg) scale(1.05);
+    }
+  }
+}
+
+@keyframes landing-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
     opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-glow {
+    animation: none;
+  }
+
+  .vizzo-squiggle,
+  .vizzo-rise,
+  .vizzo-rise[data-enter-delay],
+  .landing-window-dots span {
+    animation-name: landing-fade-in;
+    animation-duration: var(--motion-standard);
+    animation-delay: 0ms;
+  }
+
+  .landing-control,
+  .landing-card,
+  .landing-arrow,
+  .landing-feature-icon {
+    transition: none;
     transform: none;
   }
 }

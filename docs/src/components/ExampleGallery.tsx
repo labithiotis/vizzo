@@ -5,14 +5,16 @@ import { ChartImage } from './ChartImage';
 export function ExampleGallery() {
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      {chartExamples.map((example) => (
+      {chartExamples.map((example, index) => (
         <Link
           key={example.id}
           to="/docs/$page"
           params={{ page: 'examples' }}
           hash={example.id}
           aria-label={`View ${example.title} chart example`}
-          className="overflow-hidden rounded-lg border border-grid bg-paper transition-colors hover:border-plotter-blue dark:border-grid-dark dark:bg-paper-dark"
+          data-reveal
+          data-reveal-delay={index * 70}
+          className="landing-card overflow-hidden rounded-lg border border-grid bg-paper dark:border-grid-dark dark:bg-paper-dark"
         >
           <figure>
             <div className="h-1" style={{ background: example.accent }} />
@@ -21,7 +23,12 @@ export function ExampleGallery() {
               <span className="font-mono-display text-ink/70 text-xs uppercase tracking-wide dark:text-ink-dark/70">
                 {example.mark}
               </span>
-              <span className="font-mono-display text-plotter-blue text-xs">View example →</span>
+              <span className="inline-flex items-center gap-2 font-mono-display text-plotter-blue text-xs">
+                View example{' '}
+                <span aria-hidden="true" className="landing-arrow">
+                  →
+                </span>
+              </span>
             </figcaption>
           </figure>
         </Link>
