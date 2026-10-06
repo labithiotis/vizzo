@@ -15,7 +15,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@tanstack/charts": "0.14.0",
+    "@tanstack/charts": "1.0.0",
     "@vizzo/core": "workspace:*",
     "@vizzo/schemas": "workspace:*",
     "react": "19.2.8",

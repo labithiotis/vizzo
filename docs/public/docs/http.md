@@ -7,10 +7,10 @@ Open an editable JSURL2 link or send JSON. Get back PNG, SVG, or WebP bytes.
 The render route is `GET https://vizzo.dev/x`. Put the render envelope in the `data` parameter and add output options as query parameters.
 
 ```text
-https://vizzo.dev/x?width=960&height=540&theme=light&data=(definition~(marks~!(type~lineY~data~!(month~Jan~revenue~42000)(month~Feb~revenue~58000)(month~Mar~revenue~76000)(month~Apr~revenue~64000)(month~May~revenue~81000)(month~Jun~revenue~93000)~options~(x~month~y~revenue~points~~stroke~**H2563eb))~x~(scale~point~padding~0.2~label~Month)y~(scale~linear~nice~~grid~~label~Revenue_*CUSD*D))theme~light)~
+https://vizzo.dev/x?width=960&height=540&theme=light&data=(definition~(marks~!(type~lineY~data~!(month~Jan~revenue~42000)(month~Feb~revenue~58000)(month~Mar~revenue~76000)(month~Apr~revenue~64000)(month~May~revenue~81000)(month~Jun~revenue~93000)~options~(x~month~y~revenue~points~~stroke~**H2563eb))~scales~(x~(scale~point~padding~0.2~label~Month)y~(scale~linear~nice~~grid~~label~Revenue_*CUSD*D)))theme~light)~
 ```
 
-[Open the chart](https://vizzo.dev/x?width=960&height=540&theme=light&data=(definition~(marks~!(type~lineY~data~!(month~Jan~revenue~42000)(month~Feb~revenue~58000)(month~Mar~revenue~76000)(month~Apr~revenue~64000)(month~May~revenue~81000)(month~Jun~revenue~93000)~options~(x~month~y~revenue~points~~stroke~**H2563eb))~x~(scale~point~padding~0.2~label~Month)y~(scale~linear~nice~~grid~~label~Revenue_*CUSD*D))theme~light)~), then edit `width`, `height`, or `theme` in the URL. Query options override the same fields inside the envelope. The API returns image bytes, not a page or a JSON wrapper.
+[Open the chart](https://vizzo.dev/x?width=960&height=540&theme=light&data=(definition~(marks~!(type~lineY~data~!(month~Jan~revenue~42000)(month~Feb~revenue~58000)(month~Mar~revenue~76000)(month~Apr~revenue~64000)(month~May~revenue~81000)(month~Jun~revenue~93000)~options~(x~month~y~revenue~points~~stroke~**H2563eb))~scales~(x~(scale~point~padding~0.2~label~Month)y~(scale~linear~nice~~grid~~label~Revenue_*CUSD*D)))theme~light)~), then edit `width`, `height`, or `theme` in the URL. Query options override the same fields inside the envelope. The API returns image bytes, not a page or a JSON wrapper.
 
 ## JSURL2 is the default for our examples
 
@@ -26,8 +26,10 @@ const envelope = {
       data: [['A', 4], ['B', 8], ['C', 6]],
       options: { x: '0', y: '1' },
     }],
-    x: { scale: 'band' },
-    y: { scale: 'linear' },
+    scales: {
+      x: { scale: 'band' },
+      y: { scale: 'linear' },
+    },
   },
 };
 

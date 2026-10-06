@@ -61,8 +61,10 @@ export type ChartThemeInput = z.infer<typeof chartThemeSchema>;
 /** A thin JSON encoding of a TanStack Charts `ChartSpec`. Not a competing chart grammar. */
 export const chartDefinitionSchema = z.object({
   marks: z.array(chartMarkSchema).min(1),
-  x: chartAxisSchema.nullish(),
-  y: chartAxisSchema.nullish(),
+  scales: z.object({
+    x: chartAxisSchema.nullable(),
+    y: chartAxisSchema.nullable(),
+  }),
   color: chartColorSchema.optional(),
   margin: z.union([z.number(), z.record(z.string(), z.number())]).optional(),
   guides: z.boolean().optional(),

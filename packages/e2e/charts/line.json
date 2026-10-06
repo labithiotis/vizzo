@@ -14,7 +14,9 @@
         "options": { "x": "month", "y": "revenue", "points": true, "stroke": "#2563eb" }
       }
     ],
-    "x": { "scale": "point", "padding": 0.2, "label": "Month" },
-    "y": { "scale": "linear", "nice": true, "grid": true, "label": "Revenue (USD)" }
+    "scales": {
+      "x": { "scale": "point", "padding": 0.2, "label": "Month" },
+      "y": { "scale": "linear", "nice": true, "grid": true, "label": "Revenue (USD)" }
+    }
   }
 }

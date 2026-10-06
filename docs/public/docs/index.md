@@ -6,7 +6,7 @@ Turn a TanStack Charts definition into an image with a URL, the CLI, or a POST r
 
 Send a revenue chart to Slack. Attach a release report in Discord. Put a weekly trend in an email or a PNG in a tweet. Vizzo renders the file from your chart definition, without launching a browser.
 
-Start with a [working chart URL](https://vizzo.dev/x?width=960&height=540&theme=light&data=(definition~(marks~!(type~lineY~data~!(month~Jan~revenue~42000)(month~Feb~revenue~58000)(month~Mar~revenue~76000)(month~Apr~revenue~64000)(month~May~revenue~81000)(month~Jun~revenue~93000)~options~(x~month~y~revenue~points~~stroke~**H2563eb))~x~(scale~point~padding~0.2~label~Month)y~(scale~linear~nice~~grid~~label~Revenue_*CUSD*D))theme~light)~). It returns a PNG. Change `width=960` to `width=1200`, or change `theme=light` to `theme=dark` in the address bar. The `data` parameter uses JSURL2, a compact encoding of the same JSON accepted by the CLI.
+Start with a [working chart URL](https://vizzo.dev/x?width=960&height=540&theme=light&data=(definition~(marks~!(type~lineY~data~!(month~Jan~revenue~42000)(month~Feb~revenue~58000)(month~Mar~revenue~76000)(month~Apr~revenue~64000)(month~May~revenue~81000)(month~Jun~revenue~93000)~options~(x~month~y~revenue~points~~stroke~**H2563eb))~scales~(x~(scale~point~padding~0.2~label~Month)y~(scale~linear~nice~~grid~~label~Revenue_*CUSD*D)))theme~light)~). It returns a PNG. Change `width=960` to `width=1200`, or change `theme=light` to `theme=dark` in the address bar. The `data` parameter uses JSURL2, a compact encoding of the same JSON accepted by the CLI.
 
 ## Save a chart definition
 
@@ -52,16 +52,18 @@ Download [line.json](/docs/examples/line.json), or save this envelope as `line.j
         }
       }
     ],
-    "x": {
-      "scale": "point",
-      "padding": 0.2,
-      "label": "Month"
-    },
-    "y": {
-      "scale": "linear",
-      "nice": true,
-      "grid": true,
-      "label": "Revenue (USD)"
+    "scales": {
+      "x": {
+        "scale": "point",
+        "padding": 0.2,
+        "label": "Month"
+      },
+      "y": {
+        "scale": "linear",
+        "nice": true,
+        "grid": true,
+        "label": "Revenue (USD)"
+      }
     }
   },
   "theme": "light"
@@ -83,7 +85,7 @@ The output filename selects PNG. Without an output file or format, the CLI write
 Open this URL to render the same definition. JSURL2 replaces JSON punctuation with URL-friendly separators, so you can edit values directly.
 
 ```text
-https://vizzo.dev/x?width=960&height=540&theme=light&data=(definition~(marks~!(type~lineY~data~!(month~Jan~revenue~42000)(month~Feb~revenue~58000)(month~Mar~revenue~76000)(month~Apr~revenue~64000)(month~May~revenue~81000)(month~Jun~revenue~93000)~options~(x~month~y~revenue~points~~stroke~**H2563eb))~x~(scale~point~padding~0.2~label~Month)y~(scale~linear~nice~~grid~~label~Revenue_*CUSD*D))theme~light)~
+https://vizzo.dev/x?width=960&height=540&theme=light&data=(definition~(marks~!(type~lineY~data~!(month~Jan~revenue~42000)(month~Feb~revenue~58000)(month~Mar~revenue~76000)(month~Apr~revenue~64000)(month~May~revenue~81000)(month~Jun~revenue~93000)~options~(x~month~y~revenue~points~~stroke~**H2563eb))~scales~(x~(scale~point~padding~0.2~label~Month)y~(scale~linear~nice~~grid~~label~Revenue_*CUSD*D)))theme~light)~
 ```
 
 Use `data` with raw JSON or base64 if your integration already generates those. For larger definitions, send the JSON envelope in a POST body. [HTTP guide](/docs/http)

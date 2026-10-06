@@ -27,8 +27,10 @@
         }
       }
     ],
-    "x": { "scale": "point", "label": "Week" },
-    "y": { "scale": "linear", "nice": true, "grid": true, "label": "Downloads" },
+    "scales": {
+      "x": { "scale": "point", "label": "Week" },
+      "y": { "scale": "linear", "nice": true, "grid": true, "label": "Downloads" }
+    },
     "color": { "legend": { "label": "Package" } }
   }
 }

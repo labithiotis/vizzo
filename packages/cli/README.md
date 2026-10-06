@@ -70,8 +70,10 @@ TanStack Charts definition:
 {
   "definition": {
     "marks": [{ "type": "lineY", "data": [{ "month": "Jan", "revenue": 42000 }], "options": { "x": "month", "y": "revenue" } }],
-    "x": { "scale": "point" },
-    "y": { "scale": "linear", "grid": true }
+    "scales": {
+      "x": { "scale": "point" },
+      "y": { "scale": "linear", "grid": true }
+    }
   },
   "width": 960,
   "height": 540

@@ -22,8 +22,10 @@ const envelope = {
       data: [['A', 4], ['B', 8], ['C', 6]],
       options: { x: '0', y: '1' },
     }],
-    x: { scale: 'band' },
-    y: { scale: 'linear' },
+    scales: {
+      x: { scale: 'band' },
+      y: { scale: 'linear' },
+    },
   },
 };
 

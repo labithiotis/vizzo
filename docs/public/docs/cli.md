@@ -27,7 +27,7 @@ Pass a JSON envelope with a `definition` field. Input may be a file, inline JSON
 npx vizzo line.json line.png
 
 # Inline JSON
-npx vizzo '{"definition":{"marks":[{"type":"barY","data":[["A",4],["B",8],["C",6]],"options":{"x":"0","y":"1"}}],"x":{"scale":"band"},"y":{"scale":"linear"}}}' chart.png
+npx vizzo '{"definition":{"marks":[{"type":"barY","data":[["A",4],["B",8],["C",6]],"options":{"x":"0","y":"1"}}],"scales":{"x":{"scale":"band"},"y":{"scale":"linear"}}}}' chart.png
 
 # Pipe an envelope from a script
 cat line.json | npx vizzo --format png > line.png

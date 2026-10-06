@@ -37,6 +37,10 @@
         }
       }
     ],
+    "scales": {
+      "x": null,
+      "y": null
+    },
     "color": {
       "legend": {
         "label": "Letter"

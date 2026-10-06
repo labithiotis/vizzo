@@ -31,69 +31,76 @@
             "additionalProperties": false
           }
         },
-        "x": {
-          "anyOf": [
-            {
-              "type": "object",
-              "properties": {
-                "scale": {
-                  "type": "string",
-                  "enum": ["linear", "band", "point", "ordinal", "utc"]
+        "scales": {
+          "type": "object",
+          "properties": {
+            "x": {
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "scale": {
+                      "type": "string",
+                      "enum": ["linear", "band", "point", "ordinal", "utc"]
+                    },
+                    "padding": {
+                      "type": "number"
+                    },
+                    "nice": {
+                      "type": "boolean"
+                    },
+                    "grid": {
+                      "type": "boolean"
+                    },
+                    "label": {
+                      "type": "string"
+                    },
+                    "axis": {
+                      "type": "boolean"
+                    }
+                  },
+                  "additionalProperties": false
                 },
-                "padding": {
-                  "type": "number"
-                },
-                "nice": {
-                  "type": "boolean"
-                },
-                "grid": {
-                  "type": "boolean"
-                },
-                "label": {
-                  "type": "string"
-                },
-                "axis": {
-                  "type": "boolean"
+                {
+                  "type": "null"
                 }
-              },
-              "additionalProperties": false
+              ]
             },
-            {
-              "type": "null"
-            }
-          ]
-        },
-        "y": {
-          "anyOf": [
-            {
-              "type": "object",
-              "properties": {
-                "scale": {
-                  "type": "string",
-                  "enum": ["linear", "band", "point", "ordinal", "utc"]
+            "y": {
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "scale": {
+                      "type": "string",
+                      "enum": ["linear", "band", "point", "ordinal", "utc"]
+                    },
+                    "padding": {
+                      "type": "number"
+                    },
+                    "nice": {
+                      "type": "boolean"
+                    },
+                    "grid": {
+                      "type": "boolean"
+                    },
+                    "label": {
+                      "type": "string"
+                    },
+                    "axis": {
+                      "type": "boolean"
+                    }
+                  },
+                  "additionalProperties": false
                 },
-                "padding": {
-                  "type": "number"
-                },
-                "nice": {
-                  "type": "boolean"
-                },
-                "grid": {
-                  "type": "boolean"
-                },
-                "label": {
-                  "type": "string"
-                },
-                "axis": {
-                  "type": "boolean"
+                {
+                  "type": "null"
                 }
-              },
-              "additionalProperties": false
-            },
-            {
-              "type": "null"
+              ]
             }
-          ]
+          },
+          "required": ["x", "y"],
+          "additionalProperties": false
         },
         "color": {
           "type": "object",
@@ -174,7 +181,7 @@
           "additionalProperties": false
         }
       },
-      "required": ["marks"],
+      "required": ["marks", "scales"],
       "additionalProperties": false
     },
     "width": {
