@@ -123,7 +123,7 @@ or the file's `preset`) → `960×540`. An explicit size always beats a preset.
 
 ### Axes (`scales.x`, `scales.y`)
 
-TanStack Charts v1 requires both scale entries. For older chart files, move root `x` and `y` into `scales`.
+TanStack Charts v1 requires both scale entries.
 Use `null` only for dimensions no mark uses.
 
 ```jsonc

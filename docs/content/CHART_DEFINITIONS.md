@@ -59,12 +59,6 @@ keeping its scale. ISO date strings become dates for the UTC scale.
 }
 ```
 
-### Migrate from TanStack Charts v0.14
-
-Vizzo uses TanStack Charts v1. Move the former `definition.x` and `definition.y` entries inside `definition.scales`.
-Add both entries to definitions that omitted them, using `null` for unused dimensions. Mark data and options keep
-the same shape. Existing chart files and encoded URLs must use the new scale registry.
-
 ## Group lines and control color
 
 Set `z` to a series field and `color` to that field in the mark options. A color legend can show the series names. A fixed `stroke` or `fill` gives a single mark an explicit color.
