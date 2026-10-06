@@ -11,7 +11,9 @@
       "!!docs/src/routeTree.gen.ts",
       "!!docs/worker-configuration.d.ts",
       "!!examples/**/*.svg",
-      "!!docs/public/**/*.svg"
+      "!!docs/public/**/*.svg",
+      "!!.delta",
+      "!!.worktrees"
     ]
   },
   "vcs": {

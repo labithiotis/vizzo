@@ -1,4 +1,41 @@
-# AGENTS.md
+# Vizzo
+
+ALWAYS USE `./docs/WHITTLE.md`.
+
+Run `bun checks` before code change handoffs.
+Treat validated env var types as accurate. Do not add null checks for required strings.
+New dependencies use the latest compatible release; pin exact versions.
+Use Conventional Commits for commit messages. Keep the subject under ~70 chars; add a body only when the why matters.
+Use a 120 print width for code and documentation, unless the existing formatter configuration requires otherwise.
+Use MCPProxy for MCP connections when it is available. Use T3 Code (`t3-code`) MCP tools directly, bypassing MCPProxy.
+Use Git worktrees for isolated work; never clone a repo unless the user explicitly directs you to.
+Reuse dev servers; stop only those you started this session by recorded PID; never `pkill`/`killall` or name/port kills.
+
+## Routing
+
+Load the smallest relevant doc set for the task:
+
+- Open `./docs/PULL_REQUEST.md` when creating or reviewing PRs.
+- Open `./docs/TYPESCRIPT.md` when editing TypeScript or JavaScript files.
+- Open `./docs/TESTING.md` when editing tests, mocks, or test infrastructure.
+- Open `./docs/GH_WORKFLOW.md` when editing `.github/workflows/*`.
+
+## Naming
+
+- `camelCase` for directories, files, and the default fallback.
+- `PascalCase` for React components and class constructor files.
+- `UPPER_SNAKE_CASE` for markdown files.
+- Preserve framework-required filenames.
+- Branch names use optional user initials, a ticket ID when available, and a short 3-4 word description.
+  Never use AI model or framework names in branch names.
+
+## Comments
+
+- Do not add comments by default.
+- Only explain non-obvious rules or constraints that code and types cannot make clear.
+- Never narrate or restate the code. Keep necessary comments brief. When unsure, omit them.
+- Remove outdated comments as part of the change you are making.
+- PR/commit narration belongs in the PR body, not the source.
 
 ## Philosophy
 
@@ -54,31 +91,8 @@ format, theme, preset, background }` and the JSON chart-definition shapes.
 
 Keep Vizzo small. Follow KISS, YAGNI, and AHA.
 
-- Prefer readable functional code over clever indirection.
-- Use `function` for top-level declarations and arrow functions for callbacks.
-- Prefer `type` over `interface`, named exports, and unions over enums.
-- Do not add comments that restate the code.
-- Avoid type assertions (`as`) whenever possible. Where JSON input crosses
-  into TanStack's generically-typed API (see `hydrate.ts`), a narrow, commented
-  assertion at that boundary is acceptable — keep it there, not scattered.
-- Prefer duplication over premature abstraction; keep comments rare.
-- Inline one- and two-line logic; extract only when it removes complexity or
-  improves testability.
-- Add regression tests for bugs when practical.
-- Use Conventional Commits: `type(scope): subject`.
-- Run `bun run check` before committing or pushing changes.
-- Do not commit or push while any check fails; fix the findings instead of
-  suppressing them.
-- Create Git worktrees at `.worktrees/<task>` inside the repository. Ensure
-  `.worktrees/` is locally ignored in `.git/info/exclude` before creating one.
-
-## Naming
-
-- `camelCase` for directories, files, and the default fallback.
-- `PascalCase` for React components.
-- `UPPER_SNAKE_CASE` for markdown files.
-- Branch naming: use a short description of the change; never use an AI
-  model or framework name like `codex` or `claude`.
+- Do not commit or push while any check fails; fix the findings instead of suppressing them.
+- Create worktrees at `.worktrees/<task>` and locally ignore `.worktrees/` in `.git/info/exclude` before creating one.
 
 ## Docs site (Tailwind CSS v4)
 
@@ -91,25 +105,6 @@ left-0`, and `grow`/`shrink` over verbose flex equivalents.
 - Avoid arbitrary values unless the design genuinely requires them.
 - When a route component grows beyond ~75 lines or contains multiple visual
   sections, extract those sections into `src/components`.
-
-## Testing
-
-- Prefer behavior tests through public interfaces (`render()`, the CLI's
-  `runRender()`), not internal hydration details.
-- Tests are colocated next to source (`*.test.ts`).
-- Regenerate `examples/*.svg` and `docs/public/examples/*.svg` with
-  `bun run --cwd packages/e2e render` after changing an example
-  definition; don't hand-edit generated SVGs.
-- Visual changes are caught by `packages/e2e/src/visual.test.ts`, which
-  renders every `charts/*.json` to PNG and pixel-diffs it against
-  `baselines/*.png`. A failure writes the diff to `packages/e2e/.diffs/`.
-  Look at that image first; only run `bun run --cwd packages/e2e baseline`
-  once the new rendering is the intended one, and commit the changed baselines
-  with the change that caused them.
-- `bun run --cwd packages/e2e storybook` shows each example rendered live by
-  TanStack Charts beside the vizzo PNG, side by side or as a difference
-  overlay. The browser render is the reference: where the two disagree,
-  `hydrate.ts` or the SVG serializer is wrong, not the browser.
 
 ## Releasing
 

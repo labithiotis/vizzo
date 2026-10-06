@@ -11,18 +11,19 @@
   ],
   "scripts": {
     "build": "turbo run build",
-    "check": "turbo run lint format typecheck test",
+    "check": "bun run checks",
     "dev": "bun run --cwd docs dev",
     "format": "biome check --write .",
     "lint": "biome check .",
     "prepare": "lefthook install",
     "test": "turbo run test",
-    "typecheck": "turbo run typecheck"
+    "typecheck": "turbo run typecheck",
+    "checks": "bun run lint && bun run typecheck && bun run test"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.12",
     "@types/bun": "1.4.1",
-    "lefthook": "2.1.12",
+    "lefthook": "2.1.17",
     "turbo": "2.10.12",
     "typescript": "7.0.2"
   }
