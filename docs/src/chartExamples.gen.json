@@ -1,0 +1,497 @@
+[
+  {
+    "id": "line",
+    "title": "Monthly revenue",
+    "description": "A line with points makes a compact update for your team.",
+    "mark": "lineY",
+    "use": "Team updates",
+    "accent": "#2563eb",
+    "options": {
+      "definition": {
+        "marks": [
+          {
+            "type": "lineY",
+            "data": [
+              {
+                "month": "Jan",
+                "revenue": 42000
+              },
+              {
+                "month": "Feb",
+                "revenue": 58000
+              },
+              {
+                "month": "Mar",
+                "revenue": 76000
+              },
+              {
+                "month": "Apr",
+                "revenue": 64000
+              },
+              {
+                "month": "May",
+                "revenue": 81000
+              },
+              {
+                "month": "Jun",
+                "revenue": 93000
+              }
+            ],
+            "options": {
+              "x": "month",
+              "y": "revenue",
+              "points": true,
+              "stroke": "#2563eb"
+            }
+          }
+        ],
+        "x": {
+          "scale": "point",
+          "padding": 0.2,
+          "label": "Month"
+        },
+        "y": {
+          "scale": "linear",
+          "nice": true,
+          "grid": true,
+          "label": "Revenue (USD)"
+        }
+      },
+      "theme": "light"
+    },
+    "json": "{\n  \"definition\": {\n    \"marks\": [\n      {\n        \"type\": \"lineY\",\n        \"data\": [\n          {\n            \"month\": \"Jan\",\n            \"revenue\": 42000\n          },\n          {\n            \"month\": \"Feb\",\n            \"revenue\": 58000\n          },\n          {\n            \"month\": \"Mar\",\n            \"revenue\": 76000\n          },\n          {\n            \"month\": \"Apr\",\n            \"revenue\": 64000\n          },\n          {\n            \"month\": \"May\",\n            \"revenue\": 81000\n          },\n          {\n            \"month\": \"Jun\",\n            \"revenue\": 93000\n          }\n        ],\n        \"options\": {\n          \"x\": \"month\",\n          \"y\": \"revenue\",\n          \"points\": true,\n          \"stroke\": \"#2563eb\"\n        }\n      }\n    ],\n    \"x\": {\n      \"scale\": \"point\",\n      \"padding\": 0.2,\n      \"label\": \"Month\"\n    },\n    \"y\": {\n      \"scale\": \"linear\",\n      \"nice\": true,\n      \"grid\": true,\n      \"label\": \"Revenue (USD)\"\n    }\n  },\n  \"theme\": \"light\"\n}\n",
+    "url": "https://vizzo.dev/x?width=960&height=540&theme=light&data=(definition~(marks~!(type~lineY~data~!(month~Jan~revenue~42000)(month~Feb~revenue~58000)(month~Mar~revenue~76000)(month~Apr~revenue~64000)(month~May~revenue~81000)(month~Jun~revenue~93000)~options~(x~month~y~revenue~points~~stroke~**H2563eb))~x~(scale~point~padding~0.2~label~Month)y~(scale~linear~nice~~grid~~label~Revenue_*CUSD*D))theme~light)~",
+    "darkUrl": "https://vizzo.dev/x?width=960&height=540&theme=dark&data=(definition~(marks~!(type~lineY~data~!(month~Jan~revenue~42000)(month~Feb~revenue~58000)(month~Mar~revenue~76000)(month~Apr~revenue~64000)(month~May~revenue~81000)(month~Jun~revenue~93000)~options~(x~month~y~revenue~points~~stroke~**H2563eb))~x~(scale~point~padding~0.2~label~Month)y~(scale~linear~nice~~grid~~label~Revenue_*CUSD*D))theme~light)~",
+    "command": "npx vizzo line.json line.png --theme light",
+    "post": "curl https://vizzo.dev/ \\\n  -H 'Content-Type: application/json' \\\n  --data-binary @line.json \\\n  --output line.png"
+  },
+  {
+    "id": "multi-series",
+    "title": "Compare the trend",
+    "description": "Group lines by a field, then give the series a shared color legend.",
+    "mark": "lineY + color",
+    "use": "Release reports",
+    "accent": "#e3402a",
+    "options": {
+      "definition": {
+        "marks": [
+          {
+            "type": "lineY",
+            "data": [
+              {
+                "week": "W1",
+                "downloads": 120,
+                "package": "core"
+              },
+              {
+                "week": "W2",
+                "downloads": 180,
+                "package": "core"
+              },
+              {
+                "week": "W3",
+                "downloads": 260,
+                "package": "core"
+              },
+              {
+                "week": "W4",
+                "downloads": 310,
+                "package": "core"
+              },
+              {
+                "week": "W1",
+                "downloads": 60,
+                "package": "cli"
+              },
+              {
+                "week": "W2",
+                "downloads": 95,
+                "package": "cli"
+              },
+              {
+                "week": "W3",
+                "downloads": 140,
+                "package": "cli"
+              },
+              {
+                "week": "W4",
+                "downloads": 205,
+                "package": "cli"
+              },
+              {
+                "week": "W1",
+                "downloads": 20,
+                "package": "schemas"
+              },
+              {
+                "week": "W2",
+                "downloads": 28,
+                "package": "schemas"
+              },
+              {
+                "week": "W3",
+                "downloads": 45,
+                "package": "schemas"
+              },
+              {
+                "week": "W4",
+                "downloads": 70,
+                "package": "schemas"
+              }
+            ],
+            "options": {
+              "x": "week",
+              "y": "downloads",
+              "z": "package",
+              "color": "package",
+              "strokeWidth": 2.5,
+              "points": true
+            }
+          }
+        ],
+        "x": {
+          "scale": "point",
+          "label": "Week"
+        },
+        "y": {
+          "scale": "linear",
+          "nice": true,
+          "grid": true,
+          "label": "Downloads"
+        },
+        "color": {
+          "legend": {
+            "label": "Package"
+          }
+        }
+      },
+      "theme": "light"
+    },
+    "json": "{\n  \"definition\": {\n    \"marks\": [\n      {\n        \"type\": \"lineY\",\n        \"data\": [\n          {\n            \"week\": \"W1\",\n            \"downloads\": 120,\n            \"package\": \"core\"\n          },\n          {\n            \"week\": \"W2\",\n            \"downloads\": 180,\n            \"package\": \"core\"\n          },\n          {\n            \"week\": \"W3\",\n            \"downloads\": 260,\n            \"package\": \"core\"\n          },\n          {\n            \"week\": \"W4\",\n            \"downloads\": 310,\n            \"package\": \"core\"\n          },\n          {\n            \"week\": \"W1\",\n            \"downloads\": 60,\n            \"package\": \"cli\"\n          },\n          {\n            \"week\": \"W2\",\n            \"downloads\": 95,\n            \"package\": \"cli\"\n          },\n          {\n            \"week\": \"W3\",\n            \"downloads\": 140,\n            \"package\": \"cli\"\n          },\n          {\n            \"week\": \"W4\",\n            \"downloads\": 205,\n            \"package\": \"cli\"\n          },\n          {\n            \"week\": \"W1\",\n            \"downloads\": 20,\n            \"package\": \"schemas\"\n          },\n          {\n            \"week\": \"W2\",\n            \"downloads\": 28,\n            \"package\": \"schemas\"\n          },\n          {\n            \"week\": \"W3\",\n            \"downloads\": 45,\n            \"package\": \"schemas\"\n          },\n          {\n            \"week\": \"W4\",\n            \"downloads\": 70,\n            \"package\": \"schemas\"\n          }\n        ],\n        \"options\": {\n          \"x\": \"week\",\n          \"y\": \"downloads\",\n          \"z\": \"package\",\n          \"color\": \"package\",\n          \"strokeWidth\": 2.5,\n          \"points\": true\n        }\n      }\n    ],\n    \"x\": {\n      \"scale\": \"point\",\n      \"label\": \"Week\"\n    },\n    \"y\": {\n      \"scale\": \"linear\",\n      \"nice\": true,\n      \"grid\": true,\n      \"label\": \"Downloads\"\n    },\n    \"color\": {\n      \"legend\": {\n        \"label\": \"Package\"\n      }\n    }\n  },\n  \"theme\": \"light\"\n}\n",
+    "url": "https://vizzo.dev/x?width=960&height=540&theme=light&data=(definition~(marks~!(type~lineY~data~!(week~W1~downloads~120~package~core)(week~W2~downloads~180~package~core)(week~W3~downloads~260~package~core)(week~W4~downloads~310~package~core)(week~W1~downloads~60~package~cli)(week~W2~downloads~95~package~cli)(week~W3~downloads~140~package~cli)(week~W4~downloads~205~package~cli)(week~W1~downloads~20~package~schemas)(week~W2~downloads~28~package~schemas)(week~W3~downloads~45~package~schemas)(week~W4~downloads~70~package~schemas)~options~(x~week~y~downloads~z~package~color~package~strokeWidth~2.5~points))~x~(scale~point~label~Week)y~(scale~linear~nice~~grid~~label~Downloads)color~(legend~(label~Package)))theme~light)~",
+    "darkUrl": "https://vizzo.dev/x?width=960&height=540&theme=dark&data=(definition~(marks~!(type~lineY~data~!(week~W1~downloads~120~package~core)(week~W2~downloads~180~package~core)(week~W3~downloads~260~package~core)(week~W4~downloads~310~package~core)(week~W1~downloads~60~package~cli)(week~W2~downloads~95~package~cli)(week~W3~downloads~140~package~cli)(week~W4~downloads~205~package~cli)(week~W1~downloads~20~package~schemas)(week~W2~downloads~28~package~schemas)(week~W3~downloads~45~package~schemas)(week~W4~downloads~70~package~schemas)~options~(x~week~y~downloads~z~package~color~package~strokeWidth~2.5~points))~x~(scale~point~label~Week)y~(scale~linear~nice~~grid~~label~Downloads)color~(legend~(label~Package)))theme~light)~",
+    "command": "npx vizzo multi-series.json multi-series.png --theme light",
+    "post": "curl https://vizzo.dev/ \\\n  -H 'Content-Type: application/json' \\\n  --data-binary @multi-series.json \\\n  --output multi-series.png"
+  },
+  {
+    "id": "bar",
+    "title": "Compare categories",
+    "description": "Use a band scale when the order is categorical, not continuous.",
+    "mark": "barY",
+    "use": "Quick comparisons",
+    "accent": "#16a34a",
+    "options": {
+      "definition": {
+        "marks": [
+          {
+            "type": "barY",
+            "data": [
+              {
+                "letter": "A",
+                "frequency": 0.08167
+              },
+              {
+                "letter": "B",
+                "frequency": 0.01492
+              },
+              {
+                "letter": "E",
+                "frequency": 0.12702
+              },
+              {
+                "letter": "T",
+                "frequency": 0.09056
+              },
+              {
+                "letter": "O",
+                "frequency": 0.07507
+              },
+              {
+                "letter": "I",
+                "frequency": 0.06966
+              }
+            ],
+            "options": {
+              "x": "letter",
+              "y": "frequency",
+              "fill": "#16a34a"
+            }
+          }
+        ],
+        "x": {
+          "scale": "band",
+          "padding": 0.12,
+          "label": "Letter"
+        },
+        "y": {
+          "scale": "linear",
+          "nice": true,
+          "grid": true,
+          "label": "Frequency"
+        }
+      },
+      "theme": "light"
+    },
+    "json": "{\n  \"definition\": {\n    \"marks\": [\n      {\n        \"type\": \"barY\",\n        \"data\": [\n          {\n            \"letter\": \"A\",\n            \"frequency\": 0.08167\n          },\n          {\n            \"letter\": \"B\",\n            \"frequency\": 0.01492\n          },\n          {\n            \"letter\": \"E\",\n            \"frequency\": 0.12702\n          },\n          {\n            \"letter\": \"T\",\n            \"frequency\": 0.09056\n          },\n          {\n            \"letter\": \"O\",\n            \"frequency\": 0.07507\n          },\n          {\n            \"letter\": \"I\",\n            \"frequency\": 0.06966\n          }\n        ],\n        \"options\": {\n          \"x\": \"letter\",\n          \"y\": \"frequency\",\n          \"fill\": \"#16a34a\"\n        }\n      }\n    ],\n    \"x\": {\n      \"scale\": \"band\",\n      \"padding\": 0.12,\n      \"label\": \"Letter\"\n    },\n    \"y\": {\n      \"scale\": \"linear\",\n      \"nice\": true,\n      \"grid\": true,\n      \"label\": \"Frequency\"\n    }\n  },\n  \"theme\": \"light\"\n}\n",
+    "url": "https://vizzo.dev/x?width=960&height=540&theme=light&data=(definition~(marks~!(type~barY~data~!(letter~A~frequency~0.08167)(letter~B~frequency~0.01492)(letter~E~frequency~0.12702)(letter~T~frequency~0.09056)(letter~O~frequency~0.07507)(letter~I~frequency~0.06966)~options~(x~letter~y~frequency~fill~**H16a34a))~x~(scale~band~padding~0.12~label~Letter)y~(scale~linear~nice~~grid~~label~Frequency))theme~light)~",
+    "darkUrl": "https://vizzo.dev/x?width=960&height=540&theme=dark&data=(definition~(marks~!(type~barY~data~!(letter~A~frequency~0.08167)(letter~B~frequency~0.01492)(letter~E~frequency~0.12702)(letter~T~frequency~0.09056)(letter~O~frequency~0.07507)(letter~I~frequency~0.06966)~options~(x~letter~y~frequency~fill~**H16a34a))~x~(scale~band~padding~0.12~label~Letter)y~(scale~linear~nice~~grid~~label~Frequency))theme~light)~",
+    "command": "npx vizzo bar.json bar.png --theme light",
+    "post": "curl https://vizzo.dev/ \\\n  -H 'Content-Type: application/json' \\\n  --data-binary @bar.json \\\n  --output bar.png"
+  },
+  {
+    "id": "area",
+    "title": "Show the whole week",
+    "description": "Layer an area and a line over the same data to give the trend weight.",
+    "mark": "areaY + lineY",
+    "use": "Weekly digests",
+    "accent": "#0891b2",
+    "options": {
+      "definition": {
+        "marks": [
+          {
+            "type": "areaY",
+            "data": [
+              {
+                "day": "Mon",
+                "users": 120
+              },
+              {
+                "day": "Tue",
+                "users": 156
+              },
+              {
+                "day": "Wed",
+                "users": 142
+              },
+              {
+                "day": "Thu",
+                "users": 189
+              },
+              {
+                "day": "Fri",
+                "users": 205
+              },
+              {
+                "day": "Sat",
+                "users": 98
+              },
+              {
+                "day": "Sun",
+                "users": 84
+              }
+            ],
+            "options": {
+              "x": "day",
+              "y": "users",
+              "fill": "#0891b2",
+              "fillOpacity": 0.25
+            }
+          },
+          {
+            "type": "lineY",
+            "data": [
+              {
+                "day": "Mon",
+                "users": 120
+              },
+              {
+                "day": "Tue",
+                "users": 156
+              },
+              {
+                "day": "Wed",
+                "users": 142
+              },
+              {
+                "day": "Thu",
+                "users": 189
+              },
+              {
+                "day": "Fri",
+                "users": 205
+              },
+              {
+                "day": "Sat",
+                "users": 98
+              },
+              {
+                "day": "Sun",
+                "users": 84
+              }
+            ],
+            "options": {
+              "x": "day",
+              "y": "users",
+              "stroke": "#0891b2"
+            }
+          }
+        ],
+        "x": {
+          "scale": "point",
+          "label": "Day"
+        },
+        "y": {
+          "scale": "linear",
+          "nice": true,
+          "grid": true,
+          "label": "Active Users"
+        }
+      },
+      "theme": "light"
+    },
+    "json": "{\n  \"definition\": {\n    \"marks\": [\n      {\n        \"type\": \"areaY\",\n        \"data\": [\n          {\n            \"day\": \"Mon\",\n            \"users\": 120\n          },\n          {\n            \"day\": \"Tue\",\n            \"users\": 156\n          },\n          {\n            \"day\": \"Wed\",\n            \"users\": 142\n          },\n          {\n            \"day\": \"Thu\",\n            \"users\": 189\n          },\n          {\n            \"day\": \"Fri\",\n            \"users\": 205\n          },\n          {\n            \"day\": \"Sat\",\n            \"users\": 98\n          },\n          {\n            \"day\": \"Sun\",\n            \"users\": 84\n          }\n        ],\n        \"options\": {\n          \"x\": \"day\",\n          \"y\": \"users\",\n          \"fill\": \"#0891b2\",\n          \"fillOpacity\": 0.25\n        }\n      },\n      {\n        \"type\": \"lineY\",\n        \"data\": [\n          {\n            \"day\": \"Mon\",\n            \"users\": 120\n          },\n          {\n            \"day\": \"Tue\",\n            \"users\": 156\n          },\n          {\n            \"day\": \"Wed\",\n            \"users\": 142\n          },\n          {\n            \"day\": \"Thu\",\n            \"users\": 189\n          },\n          {\n            \"day\": \"Fri\",\n            \"users\": 205\n          },\n          {\n            \"day\": \"Sat\",\n            \"users\": 98\n          },\n          {\n            \"day\": \"Sun\",\n            \"users\": 84\n          }\n        ],\n        \"options\": {\n          \"x\": \"day\",\n          \"y\": \"users\",\n          \"stroke\": \"#0891b2\"\n        }\n      }\n    ],\n    \"x\": {\n      \"scale\": \"point\",\n      \"label\": \"Day\"\n    },\n    \"y\": {\n      \"scale\": \"linear\",\n      \"nice\": true,\n      \"grid\": true,\n      \"label\": \"Active Users\"\n    }\n  },\n  \"theme\": \"light\"\n}\n",
+    "url": "https://vizzo.dev/x?width=960&height=540&theme=light&data=(definition~(marks~!(type~areaY~data~!(day~Mon~users~120)(day~Tue~users~156)(day~Wed~users~142)(day~Thu~users~189)(day~Fri~users~205)(day~Sat~users~98)(day~Sun~users~84)~options~(x~day~y~users~fill~**H0891b2~fillOpacity~0.25))(type~lineY~data~!(day~Mon~users~120)(day~Tue~users~156)(day~Wed~users~142)(day~Thu~users~189)(day~Fri~users~205)(day~Sat~users~98)(day~Sun~users~84)~options~(x~day~y~users~stroke~**H0891b2))~x~(scale~point~label~Day)y~(scale~linear~nice~~grid~~label~Active_Users))theme~light)~",
+    "darkUrl": "https://vizzo.dev/x?width=960&height=540&theme=dark&data=(definition~(marks~!(type~areaY~data~!(day~Mon~users~120)(day~Tue~users~156)(day~Wed~users~142)(day~Thu~users~189)(day~Fri~users~205)(day~Sat~users~98)(day~Sun~users~84)~options~(x~day~y~users~fill~**H0891b2~fillOpacity~0.25))(type~lineY~data~!(day~Mon~users~120)(day~Tue~users~156)(day~Wed~users~142)(day~Thu~users~189)(day~Fri~users~205)(day~Sat~users~98)(day~Sun~users~84)~options~(x~day~y~users~stroke~**H0891b2))~x~(scale~point~label~Day)y~(scale~linear~nice~~grid~~label~Active_Users))theme~light)~",
+    "command": "npx vizzo area.json area.png --theme light",
+    "post": "curl https://vizzo.dev/ \\\n  -H 'Content-Type: application/json' \\\n  --data-binary @area.json \\\n  --output area.png"
+  },
+  {
+    "id": "time-series",
+    "title": "Put time on the axis",
+    "description": "ISO date strings and a UTC scale keep the timeline consistent.",
+    "mark": "lineY + utc",
+    "use": "Monthly reports",
+    "accent": "#7c3aed",
+    "options": {
+      "definition": {
+        "marks": [
+          {
+            "type": "lineY",
+            "data": [
+              {
+                "date": "2024-01-01",
+                "value": 42
+              },
+              {
+                "date": "2024-02-01",
+                "value": 58
+              },
+              {
+                "date": "2024-03-01",
+                "value": 51
+              },
+              {
+                "date": "2024-04-01",
+                "value": 66
+              },
+              {
+                "date": "2024-05-01",
+                "value": 74
+              },
+              {
+                "date": "2024-06-01",
+                "value": 69
+              },
+              {
+                "date": "2024-07-01",
+                "value": 88
+              },
+              {
+                "date": "2024-08-01",
+                "value": 95
+              },
+              {
+                "date": "2024-09-01",
+                "value": 82
+              },
+              {
+                "date": "2024-10-01",
+                "value": 101
+              },
+              {
+                "date": "2024-11-01",
+                "value": 96
+              },
+              {
+                "date": "2024-12-01",
+                "value": 118
+              }
+            ],
+            "options": {
+              "x": "date",
+              "y": "value",
+              "points": true,
+              "stroke": "#7c3aed"
+            }
+          }
+        ],
+        "x": {
+          "scale": "utc",
+          "label": "Month"
+        },
+        "y": {
+          "scale": "linear",
+          "nice": true,
+          "grid": true,
+          "label": "Signups"
+        }
+      },
+      "theme": "light"
+    },
+    "json": "{\n  \"definition\": {\n    \"marks\": [\n      {\n        \"type\": \"lineY\",\n        \"data\": [\n          {\n            \"date\": \"2024-01-01\",\n            \"value\": 42\n          },\n          {\n            \"date\": \"2024-02-01\",\n            \"value\": 58\n          },\n          {\n            \"date\": \"2024-03-01\",\n            \"value\": 51\n          },\n          {\n            \"date\": \"2024-04-01\",\n            \"value\": 66\n          },\n          {\n            \"date\": \"2024-05-01\",\n            \"value\": 74\n          },\n          {\n            \"date\": \"2024-06-01\",\n            \"value\": 69\n          },\n          {\n            \"date\": \"2024-07-01\",\n            \"value\": 88\n          },\n          {\n            \"date\": \"2024-08-01\",\n            \"value\": 95\n          },\n          {\n            \"date\": \"2024-09-01\",\n            \"value\": 82\n          },\n          {\n            \"date\": \"2024-10-01\",\n            \"value\": 101\n          },\n          {\n            \"date\": \"2024-11-01\",\n            \"value\": 96\n          },\n          {\n            \"date\": \"2024-12-01\",\n            \"value\": 118\n          }\n        ],\n        \"options\": {\n          \"x\": \"date\",\n          \"y\": \"value\",\n          \"points\": true,\n          \"stroke\": \"#7c3aed\"\n        }\n      }\n    ],\n    \"x\": {\n      \"scale\": \"utc\",\n      \"label\": \"Month\"\n    },\n    \"y\": {\n      \"scale\": \"linear\",\n      \"nice\": true,\n      \"grid\": true,\n      \"label\": \"Signups\"\n    }\n  },\n  \"theme\": \"light\"\n}\n",
+    "url": "https://vizzo.dev/x?width=960&height=540&theme=light&data=(definition~(marks~!(type~lineY~data~!(date~*2024-01-01~value~42)(date~*2024-02-01~value~58)(date~*2024-03-01~value~51)(date~*2024-04-01~value~66)(date~*2024-05-01~value~74)(date~*2024-06-01~value~69)(date~*2024-07-01~value~88)(date~*2024-08-01~value~95)(date~*2024-09-01~value~82)(date~*2024-10-01~value~101)(date~*2024-11-01~value~96)(date~*2024-12-01~value~118)~options~(x~date~y~value~points~~stroke~**H7c3aed))~x~(scale~utc~label~Month)y~(scale~linear~nice~~grid~~label~Signups))theme~light)~",
+    "darkUrl": "https://vizzo.dev/x?width=960&height=540&theme=dark&data=(definition~(marks~!(type~lineY~data~!(date~*2024-01-01~value~42)(date~*2024-02-01~value~58)(date~*2024-03-01~value~51)(date~*2024-04-01~value~66)(date~*2024-05-01~value~74)(date~*2024-06-01~value~69)(date~*2024-07-01~value~88)(date~*2024-08-01~value~95)(date~*2024-09-01~value~82)(date~*2024-10-01~value~101)(date~*2024-11-01~value~96)(date~*2024-12-01~value~118)~options~(x~date~y~value~points~~stroke~**H7c3aed))~x~(scale~utc~label~Month)y~(scale~linear~nice~~grid~~label~Signups))theme~light)~",
+    "command": "npx vizzo time-series.json time-series.png --theme light",
+    "post": "curl https://vizzo.dev/ \\\n  -H 'Content-Type: application/json' \\\n  --data-binary @time-series.json \\\n  --output time-series.png"
+  },
+  {
+    "id": "pie",
+    "title": "See the proportions",
+    "description": "A pie mark and an ordinal color legend show the share of each category.",
+    "mark": "pie",
+    "use": "Share of total",
+    "accent": "#d97706",
+    "options": {
+      "definition": {
+        "marks": [
+          {
+            "type": "pie",
+            "data": [
+              {
+                "letter": "E",
+                "frequency": 0.12702
+              },
+              {
+                "letter": "T",
+                "frequency": 0.09056
+              },
+              {
+                "letter": "A",
+                "frequency": 0.08167
+              },
+              {
+                "letter": "O",
+                "frequency": 0.07507
+              },
+              {
+                "letter": "I",
+                "frequency": 0.06966
+              },
+              {
+                "letter": "N",
+                "frequency": 0.06749
+              }
+            ],
+            "options": {
+              "value": "frequency",
+              "color": "letter",
+              "key": "letter",
+              "innerRadius": 0
+            }
+          }
+        ],
+        "color": {
+          "legend": {
+            "label": "Letter"
+          }
+        }
+      },
+      "theme": "light"
+    },
+    "json": "{\n  \"definition\": {\n    \"marks\": [\n      {\n        \"type\": \"pie\",\n        \"data\": [\n          {\n            \"letter\": \"E\",\n            \"frequency\": 0.12702\n          },\n          {\n            \"letter\": \"T\",\n            \"frequency\": 0.09056\n          },\n          {\n            \"letter\": \"A\",\n            \"frequency\": 0.08167\n          },\n          {\n            \"letter\": \"O\",\n            \"frequency\": 0.07507\n          },\n          {\n            \"letter\": \"I\",\n            \"frequency\": 0.06966\n          },\n          {\n            \"letter\": \"N\",\n            \"frequency\": 0.06749\n          }\n        ],\n        \"options\": {\n          \"value\": \"frequency\",\n          \"color\": \"letter\",\n          \"key\": \"letter\",\n          \"innerRadius\": 0\n        }\n      }\n    ],\n    \"color\": {\n      \"legend\": {\n        \"label\": \"Letter\"\n      }\n    }\n  },\n  \"theme\": \"light\"\n}\n",
+    "url": "https://vizzo.dev/x?width=960&height=540&theme=light&data=(definition~(marks~!(type~pie~data~!(letter~E~frequency~0.12702)(letter~T~frequency~0.09056)(letter~A~frequency~0.08167)(letter~O~frequency~0.07507)(letter~I~frequency~0.06966)(letter~N~frequency~0.06749)~options~(value~frequency~color~letter~key~letter~innerRadius~0))~color~(legend~(label~Letter)))theme~light)~",
+    "darkUrl": "https://vizzo.dev/x?width=960&height=540&theme=dark&data=(definition~(marks~!(type~pie~data~!(letter~E~frequency~0.12702)(letter~T~frequency~0.09056)(letter~A~frequency~0.08167)(letter~O~frequency~0.07507)(letter~I~frequency~0.06966)(letter~N~frequency~0.06749)~options~(value~frequency~color~letter~key~letter~innerRadius~0))~color~(legend~(label~Letter)))theme~light)~",
+    "command": "npx vizzo pie.json pie.png --theme light",
+    "post": "curl https://vizzo.dev/ \\\n  -H 'Content-Type: application/json' \\\n  --data-binary @pie.json \\\n  --output pie.png"
+  }
+]

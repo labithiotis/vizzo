@@ -31,7 +31,7 @@ No install needed — run it with `npx`:
 npx vizzo chart.json --output chart.png
 ```
 
-`bunx vizzo` and `pnpm dlx vizzo` work the same way.
+`bunx --bun vizzo` runs with Bun, without Node installed. `pnpm dlx vizzo` runs with Node.
 
 ## CLI
 

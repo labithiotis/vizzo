@@ -4,7 +4,7 @@ import appCss from '../app.css?url';
 
 const SITE_TITLE = 'Vizzo — Render charts, anywhere.';
 const SITE_DESCRIPTION =
-  'A lightweight CLI and SDK that renders Grammar of Graphics chart definitions to SVG, PNG, and WebP — built for agents, bots, and CI. No browser, no Playwright, no Canvas.';
+  'Render TanStack Charts definitions as SVG, PNG, or WebP with a URL, CLI, or SDK. Share charts in messages, reports, and posts.';
 
 export const Route = createRootRoute({
   head: () => ({

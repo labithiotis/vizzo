@@ -1,0 +1,208 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "definition": {
+      "type": "object",
+      "properties": {
+        "marks": {
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": ["lineY", "lineX", "areaY", "barY", "barX", "ruleY", "ruleX", "dot", "pie"]
+              },
+              "data": {
+                "type": "array",
+                "items": {}
+              },
+              "options": {
+                "type": "object",
+                "propertyNames": {
+                  "type": "string"
+                },
+                "additionalProperties": {}
+              }
+            },
+            "required": ["type", "data"],
+            "additionalProperties": false
+          }
+        },
+        "x": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "scale": {
+                  "type": "string",
+                  "enum": ["linear", "band", "point", "ordinal", "utc"]
+                },
+                "padding": {
+                  "type": "number"
+                },
+                "nice": {
+                  "type": "boolean"
+                },
+                "grid": {
+                  "type": "boolean"
+                },
+                "label": {
+                  "type": "string"
+                },
+                "axis": {
+                  "type": "boolean"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "y": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "scale": {
+                  "type": "string",
+                  "enum": ["linear", "band", "point", "ordinal", "utc"]
+                },
+                "padding": {
+                  "type": "number"
+                },
+                "nice": {
+                  "type": "boolean"
+                },
+                "grid": {
+                  "type": "boolean"
+                },
+                "label": {
+                  "type": "string"
+                },
+                "axis": {
+                  "type": "boolean"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "color": {
+          "type": "object",
+          "properties": {
+            "domain": {
+              "type": "array",
+              "items": {}
+            },
+            "range": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "legend": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "label": {
+                      "type": "string"
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        "margin": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "object",
+              "propertyNames": {
+                "type": "string"
+              },
+              "additionalProperties": {
+                "type": "number"
+              }
+            }
+          ]
+        },
+        "guides": {
+          "type": "boolean"
+        },
+        "clip": {
+          "type": "boolean"
+        },
+        "theme": {
+          "type": "object",
+          "properties": {
+            "foreground": {
+              "type": "string"
+            },
+            "muted": {
+              "type": "string"
+            },
+            "grid": {
+              "type": "string"
+            },
+            "background": {
+              "type": "string"
+            },
+            "palette": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "required": ["marks"],
+      "additionalProperties": false
+    },
+    "width": {
+      "type": "integer",
+      "exclusiveMinimum": 0,
+      "maximum": 9007199254740991
+    },
+    "height": {
+      "type": "integer",
+      "exclusiveMinimum": 0,
+      "maximum": 9007199254740991
+    },
+    "format": {
+      "type": "string",
+      "enum": ["svg", "png", "webp"]
+    },
+    "theme": {
+      "type": "string",
+      "enum": ["light", "dark"]
+    },
+    "preset": {
+      "type": "string",
+      "enum": ["og", "twitter", "linkedin", "discord"]
+    },
+    "background": {
+      "type": "string"
+    }
+  },
+  "required": ["definition"],
+  "additionalProperties": false
+}

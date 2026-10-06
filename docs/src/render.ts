@@ -30,7 +30,7 @@ const apiQuerySchema = renderOptionsSchema
   .pipe(apiOptionsSchema);
 
 function errorResponse(error: string, status: number, headers: Record<string, string> = {}) {
-  return Response.json({ error }, { status, headers: { ...CORS_HEADERS, ...headers } });
+  return Response.json({ error }, { status, headers: { ...CORS_HEADERS, 'Cache-Control': 'no-store', ...headers } });
 }
 
 async function readBody(request: Request) {
@@ -128,7 +128,7 @@ export async function renderRequest(request: Request, limiter: RateLimit): Promi
     if (!options.success) {
       return Response.json(
         { error: 'Invalid render options.', issues: options.error.issues },
-        { status: 400, headers: CORS_HEADERS },
+        { status: 400, headers: { ...CORS_HEADERS, 'Cache-Control': 'no-store' } },
       );
     }
     const result = await render(options.data);
@@ -136,7 +136,7 @@ export async function renderRequest(request: Request, limiter: RateLimit): Promi
       headers: {
         ...CORS_HEADERS,
         'Content-Type': result.format === 'svg' ? 'image/svg+xml' : `image/${result.format}`,
-        'Cache-Control': 'no-store',
+        'Cache-Control': request.method === 'GET' || request.method === 'HEAD' ? 'public, max-age=2592000' : 'no-store',
         'Content-Security-Policy': "default-src 'none'; style-src 'unsafe-inline'; sandbox",
         'X-Content-Type-Options': 'nosniff',
       },
