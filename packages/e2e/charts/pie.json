@@ -14,6 +14,7 @@
         "options": { "value": "frequency", "color": "letter", "key": "letter", "innerRadius": 0 }
       }
     ],
+    "scales": { "x": null, "y": null },
     "color": { "legend": { "label": "Letter" } }
   }
 }

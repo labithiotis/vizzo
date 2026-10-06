@@ -20,7 +20,9 @@
         "options": { "x": "date", "y": "value", "points": true, "stroke": "#7c3aed" }
       }
     ],
-    "x": { "scale": "utc", "label": "Month" },
-    "y": { "scale": "linear", "nice": true, "grid": true, "label": "Signups" }
+    "scales": {
+      "x": { "scale": "utc", "label": "Month" },
+      "y": { "scale": "linear", "nice": true, "grid": true, "label": "Signups" }
+    }
   }
 }

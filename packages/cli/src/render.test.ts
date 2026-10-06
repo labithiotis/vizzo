@@ -44,8 +44,10 @@ const chartJson = JSON.stringify({
         options: { x: 'x', y: 'y' },
       },
     ],
-    x: { scale: 'linear' },
-    y: { scale: 'linear' },
+    scales: {
+      x: { scale: 'linear' },
+      y: { scale: 'linear' },
+    },
   },
 });
 

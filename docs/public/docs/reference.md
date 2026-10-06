@@ -14,8 +14,10 @@ Vizzo accepts the same envelope through the CLI and HTTP API. The SDK accepts th
       "data": [["A", 4], ["B", 8], ["C", 6]],
       "options": { "x": "0", "y": "1" }
     }],
-    "x": { "scale": "band" },
-    "y": { "scale": "linear" }
+    "scales": {
+      "x": { "scale": "band" },
+      "y": { "scale": "linear" }
+    }
   },
   "width": 960,
   "height": 540,
@@ -51,7 +53,7 @@ Vizzo vendors Roboto for raster text. The CLI can use `--font` for a local font 
 `theme=dark` sets light text, a dark background, and muted grid lines. `theme=light` sets dark text on white. Definition-level theme values override the named theme. Explicit mark colors stay explicit, so choose brighter strokes for a dark chart when needed.
 
 ```text
-https://vizzo.dev/x?width=960&height=540&theme=dark&data=(definition~(marks~!(type~lineY~data~!(month~Jan~revenue~42000)(month~Feb~revenue~58000)(month~Mar~revenue~76000)(month~Apr~revenue~64000)(month~May~revenue~81000)(month~Jun~revenue~93000)~options~(x~month~y~revenue~points~~stroke~**H2563eb))~x~(scale~point~padding~0.2~label~Month)y~(scale~linear~nice~~grid~~label~Revenue_*CUSD*D))theme~light)~
+https://vizzo.dev/x?width=960&height=540&theme=dark&data=(definition~(marks~!(type~lineY~data~!(month~Jan~revenue~42000)(month~Feb~revenue~58000)(month~Mar~revenue~76000)(month~Apr~revenue~64000)(month~May~revenue~81000)(month~Jun~revenue~93000)~options~(x~month~y~revenue~points~~stroke~**H2563eb))~scales~(x~(scale~point~padding~0.2~label~Month)y~(scale~linear~nice~~grid~~label~Revenue_*CUSD*D)))theme~light)~
 ```
 
 For PNG and WebP, `background` fills the raster canvas behind the chart. An opaque named or definition-level theme background covers that canvas. Change `definition.theme.background` to recolor the visible chart background in every format. Encode a literal `#` as `%23` in a query parameter.

@@ -13,8 +13,10 @@ const lineDefinition = {
       options: { x: 'month', y: 'revenue', points: true },
     },
   ],
-  x: { scale: 'point', padding: 0.2 },
-  y: { scale: 'linear', nice: true, grid: true },
+  scales: {
+    x: { scale: 'point', padding: 0.2 },
+    y: { scale: 'linear', nice: true, grid: true },
+  },
 };
 
 const pieDefinition = {
@@ -28,6 +30,7 @@ const pieDefinition = {
       options: { value: 'frequency', color: 'letter', key: 'letter' },
     },
   ],
+  scales: { x: null, y: null },
 };
 
 describe('render', () => {
@@ -62,6 +65,24 @@ describe('render', () => {
   });
 
   test('rejects a definition with no marks', async () => {
-    await expect(render({ definition: { marks: [] } })).rejects.toThrow();
+    await expect(render({ definition: { marks: [], scales: { x: null, y: null } } })).rejects.toThrow();
+  });
+
+  test.each([
+    { type: 'ruleX', scales: { x: { scale: 'linear' }, y: null } },
+    { type: 'ruleY', scales: { x: null, y: { scale: 'linear' } } },
+  ])('renders $type with an unused null scale', async ({ type, scales }) => {
+    const result = await render({
+      definition: { marks: [{ type, data: [2], options: { stroke: '#dc2626' } }], scales },
+      width: 400,
+      height: 200,
+    });
+    expect(result.data as string).toContain('stroke="#dc2626"');
+  });
+
+  test('rejects a null scale for a dimension used by a mark', async () => {
+    await expect(
+      render({ definition: { ...lineDefinition, scales: { ...lineDefinition.scales, x: null } } }),
+    ).rejects.toThrow();
   });
 });

@@ -57,9 +57,8 @@ function buildScale(kind: ScaleKind, padding: number | undefined) {
   }
 }
 
-function buildAxis(axis: ChartAxisInput | null | undefined) {
+function buildAxis(axis: ChartAxisInput | null) {
   if (axis === null) return null;
-  if (axis === undefined) return undefined;
   return {
     scale: buildScale(axis.scale ?? 'linear', axis.padding),
     nice: axis.nice,
@@ -78,7 +77,7 @@ function coerceTemporalField(data: readonly unknown[], fieldKey: unknown, kind: 
   });
 }
 
-function buildMark(mark: ChartMarkInput, x: ChartAxisInput | null | undefined, y: ChartAxisInput | null | undefined) {
+function buildMark(mark: ChartMarkInput, x: ChartAxisInput | null, y: ChartAxisInput | null) {
   const fn = CARTESIAN_MARKS[mark.type];
   if (!fn) throw new Error(`Unsupported mark type for a cartesian chart: "${mark.type}"`);
   const options = mark.options ?? {};
@@ -129,11 +128,13 @@ function hydratePieDefinition(input: ChartDefinitionInput, pieMark: ChartMarkInp
   return {
     marks: [
       polar({
+        scales: { angle: null, radius: null },
         inset: typeof options.inset === 'number' ? options.inset : 8,
         radiusRatio: typeof options.radiusRatio === 'number' ? options.radiusRatio : 0.82,
         marks: [arc],
       }),
     ],
+    scales: { x: buildAxis(input.scales.x), y: buildAxis(input.scales.y) },
     color: buildColor(input.color),
     theme: input.theme,
   } as unknown as StaticChartDefinition;
@@ -141,9 +142,8 @@ function hydratePieDefinition(input: ChartDefinitionInput, pieMark: ChartMarkInp
 
 function hydrateCartesianDefinition(input: ChartDefinitionInput): StaticChartDefinition {
   return {
-    marks: input.marks.map((mark) => buildMark(mark, input.x, input.y)),
-    x: buildAxis(input.x),
-    y: buildAxis(input.y),
+    marks: input.marks.map((mark) => buildMark(mark, input.scales.x, input.scales.y)),
+    scales: { x: buildAxis(input.scales.x), y: buildAxis(input.scales.y) },
     color: buildColor(input.color),
     margin: input.margin,
     guides: input.guides,

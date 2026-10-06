@@ -29,8 +29,8 @@ never seen an example of, instead of only ever copying a recipe:
 | **Data** | The rows a mark consumes — one array per mark, no shared "series" container | `marks[].data` |
 | **Marks** | The geometric form — line, bar, area, dot, rule, pie | `marks[].type` |
 | **Channels** | Mappings *from a data field* to position, grouping, color, radius, or identity | `marks[].options.x` / `.y` / `.z` / `.color` / `.r` / `.key`, each set to a **field name string** |
-| **Scales** | How semantic values (numbers, categories, dates) become pixel coordinates | `definition.x.scale` / `definition.y.scale` |
-| **Guides** | Axes, ticks, grid lines, titles, legends — how the scales get explained | `definition.x`/`y` (`grid`, `label`, `axis`), `definition.color.legend` |
+| **Scales** | How semantic values (numbers, categories, dates) become pixel coordinates | `definition.scales.x.scale` / `definition.scales.y.scale` |
+| **Guides** | Axes, ticks, grid lines, titles, legends — how the scales get explained | `definition.scales.x`/`y` (`grid`, `label`, `axis`), `definition.color.legend` |
 | **Layers** | Marks drawn together, in declaration order — later marks paint over earlier ones | the order of the `marks` array |
 
 The one distinction that matters most: **a channel is a field name, a style
@@ -109,8 +109,10 @@ or the file's `preset`) → `960×540`. An explicit size always beats a preset.
 ```jsonc
 {
   "marks": [ /* required, at least one — see Marks */ ],
-  "x": { /* axis */ },    // omit for pie; null only if no mark uses x
-  "y": { /* axis */ },
+  "scales": {           // required; both entries must be present
+    "x": { /* axis */ }, // null only if no mark uses x; null for pie
+    "y": { /* axis */ }  // null only if no mark uses y; null for pie
+  },
   "color": { /* color scale + legend */ },
   "margin": 4,            // number, or { "top": 20, "right": 20, "bottom": 40, "left": 50 }
   "guides": true,         // false hides axes, ticks, grids, legends
@@ -119,7 +121,10 @@ or the file's `preset`) → `960×540`. An explicit size always beats a preset.
 }
 ```
 
-### Axes (`x`, `y`)
+### Axes (`scales.x`, `scales.y`)
+
+TanStack Charts v1 requires both scale entries. For older chart files, move root `x` and `y` into `scales`.
+Use `null` only for dimensions no mark uses.
 
 ```jsonc
 {
@@ -250,9 +255,9 @@ slice color, defaults to `value`), `key` (identity, defaults to `color`),
 `innerRadius` (0 = pie, >0 = donut), `cornerRadius`, `radiusRatio`
 (default `0.82`), `inset` (default `8`)
 
-**A pie chart is polar, not cartesian.** If any mark is `pie`, Vizzo renders
-*only* that pie and ignores `x`, `y`, `margin`, `guides`, `clip`, and every
-other mark. Never mix `pie` with cartesian marks; `color` and `theme` still apply.
+**A pie chart is polar.** Set `scales.x` and `scales.y` to `null`. If any mark is `pie`, Vizzo renders only that pie
+and ignores `margin`, `guides`, `clip`, and every other mark. Never mix `pie` with Cartesian marks. `color` and `theme`
+still apply.
 
 ### Stacking and grouping
 
@@ -286,8 +291,10 @@ Each is a complete chart file. Render with `vizzo chart.json out.svg`.
         "options": { "x": "month", "y": "revenue", "stroke": "#2563eb", "strokeWidth": 2, "points": true }
       }
     ],
-    "x": { "scale": "point", "label": "Month" },
-    "y": { "scale": "linear", "nice": true, "grid": true, "label": "Revenue" }
+    "scales": {
+      "x": { "scale": "point", "label": "Month" },
+      "y": { "scale": "linear", "nice": true, "grid": true, "label": "Revenue" }
+    }
   }
 }
 ```
@@ -309,8 +316,10 @@ Each is a complete chart file. Render with `vizzo chart.json out.svg`.
         "options": { "x": "week", "y": "downloads", "z": "package", "color": "package", "strokeWidth": 2.5 }
       }
     ],
-    "x": { "scale": "point", "label": "Week" },
-    "y": { "scale": "linear", "nice": true, "grid": true, "label": "Downloads" },
+    "scales": {
+      "x": { "scale": "point", "label": "Week" },
+      "y": { "scale": "linear", "nice": true, "grid": true, "label": "Downloads" }
+    },
     "color": { "legend": { "label": "Package" } }
   }
 }
@@ -328,8 +337,10 @@ Each is a complete chart file. Render with `vizzo chart.json out.svg`.
         "options": { "x": "letter", "y": "frequency", "fill": "#16a34a", "radius": 2 }
       }
     ],
-    "x": { "scale": "band", "padding": 0.12, "label": "Letter" },
-    "y": { "scale": "linear", "nice": true, "grid": true, "label": "Frequency" }
+    "scales": {
+      "x": { "scale": "band", "padding": 0.12, "label": "Letter" },
+      "y": { "scale": "linear", "nice": true, "grid": true, "label": "Frequency" }
+    }
   }
 }
 ```
@@ -352,8 +363,10 @@ group side-by-side, or add `"offset": "normalize"` for 100% stacked.
         "options": { "x": "quarter", "y": "revenue", "z": "region", "color": "region", "layout": { "type": "stack" } }
       }
     ],
-    "x": { "scale": "band", "padding": 0.2 },
-    "y": { "scale": "linear", "nice": true, "grid": true },
+    "scales": {
+      "x": { "scale": "band", "padding": 0.2 },
+      "y": { "scale": "linear", "nice": true, "grid": true }
+    },
     "color": { "legend": true }
   }
 }
@@ -371,8 +384,10 @@ group side-by-side, or add `"offset": "normalize"` for 100% stacked.
         "options": { "x": "count", "y": "name", "fill": "#2563eb", "radius": 3 }
       }
     ],
-    "x": { "scale": "linear", "nice": true, "grid": true },
-    "y": { "scale": "band", "padding": 0.2 }
+    "scales": {
+      "x": { "scale": "linear", "nice": true, "grid": true },
+      "y": { "scale": "band", "padding": 0.2 }
+    }
   }
 }
 ```
@@ -394,8 +409,10 @@ group side-by-side, or add `"offset": "normalize"` for 100% stacked.
         "options": { "x": "day", "y": "users", "stroke": "#0891b2", "strokeWidth": 2 }
       }
     ],
-    "x": { "scale": "point", "label": "Day" },
-    "y": { "scale": "linear", "nice": true, "grid": true, "label": "Active Users" }
+    "scales": {
+      "x": { "scale": "point", "label": "Day" },
+      "y": { "scale": "linear", "nice": true, "grid": true, "label": "Active Users" }
+    }
   }
 }
 ```
@@ -412,8 +429,10 @@ group side-by-side, or add `"offset": "normalize"` for 100% stacked.
         "options": { "x": "date", "y": "value", "stroke": "#7c3aed", "points": true }
       }
     ],
-    "x": { "scale": "utc", "label": "Month" },
-    "y": { "scale": "linear", "nice": true, "grid": true, "label": "Signups" }
+    "scales": {
+      "x": { "scale": "utc", "label": "Month" },
+      "y": { "scale": "linear", "nice": true, "grid": true, "label": "Signups" }
+    }
   }
 }
 ```
@@ -433,8 +452,10 @@ group side-by-side, or add `"offset": "normalize"` for 100% stacked.
         "options": { "x": "revenue", "y": "retention", "r": "accounts", "color": "segment", "fillOpacity": 0.7 }
       }
     ],
-    "x": { "scale": "linear", "nice": true, "label": "Revenue" },
-    "y": { "scale": "linear", "nice": true, "label": "Retention" },
+    "scales": {
+      "x": { "scale": "linear", "nice": true, "label": "Revenue" },
+      "y": { "scale": "linear", "nice": true, "label": "Retention" }
+    },
     "color": { "legend": true }
   }
 }
@@ -453,13 +474,15 @@ group side-by-side, or add `"offset": "normalize"` for 100% stacked.
       },
       { "type": "ruleY", "data": [200], "options": { "stroke": "#dc2626", "strokeDasharray": "4 4" } }
     ],
-    "x": { "scale": "point" },
-    "y": { "scale": "linear", "nice": true, "grid": true, "label": "ms" }
+    "scales": {
+      "x": { "scale": "point" },
+      "y": { "scale": "linear", "nice": true, "grid": true, "label": "ms" }
+    }
   }
 }
 ```
 
-**Donut** — `innerRadius > 0`. No `x`/`y`, and no other marks.
+**Donut** — `innerRadius > 0`. Set both `scales.x` and `scales.y` to `null`, with no other marks.
 
 ```json
 {
@@ -471,6 +494,7 @@ group side-by-side, or add `"offset": "normalize"` for 100% stacked.
         "options": { "value": "frequency", "color": "letter", "key": "letter", "innerRadius": 60, "cornerRadius": 4 }
       }
     ],
+    "scales": { "x": null, "y": null },
     "color": { "legend": { "label": "Letter" } }
   }
 }
@@ -503,7 +527,7 @@ handing rows to a mark.
 | Chart renders but is empty | A channel names a field that isn't in `data`. Check spelling against the row keys. |
 | `invalid_value` listing mark names | `marks[].type` isn't one of the nine supported marks. |
 | `too_small` on `marks` | `marks` must have at least one entry. |
-| `Chart scale "y" cannot be null when a mark materializes its channel` | `"y": null` while a mark uses `y`. Use `"axis": false` to hide the axis instead. |
+| `Chart scale "y" cannot be null when a mark materializes its channel` | `"scales": { "y": null }` while a mark uses `y`. Use `"axis": false` to hide the axis instead. |
 | `A "pie" mark requires a string "value" option naming the numeric field.` | Add `"value": "<field>"` to the pie's options. |
 | Bars are hairlines | The categorical axis is `point`; use `band`. |
 | Cartesian marks vanished | A `pie` mark is present, so only the pie renders. |

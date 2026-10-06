@@ -36,16 +36,18 @@
         }
       }
     ],
-    "x": {
-      "scale": "band",
-      "padding": 0.12,
-      "label": "Letter"
-    },
-    "y": {
-      "scale": "linear",
-      "nice": true,
-      "grid": true,
-      "label": "Frequency"
+    "scales": {
+      "x": {
+        "scale": "band",
+        "padding": 0.12,
+        "label": "Letter"
+      },
+      "y": {
+        "scale": "linear",
+        "nice": true,
+        "grid": true,
+        "label": "Frequency"
+      }
     }
   },
   "theme": "light"

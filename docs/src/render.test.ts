@@ -14,8 +14,10 @@ const definition = {
       options: { x: 'x', y: 'y' },
     },
   ],
-  x: { scale: 'linear' },
-  y: { scale: 'linear' },
+  scales: {
+    x: { scale: 'linear' },
+    y: { scale: 'linear' },
+  },
 };
 
 function request(body: unknown, headers: Record<string, string> = {}) {
@@ -86,7 +88,7 @@ describe('POST /', () => {
 
   test.each([
     {},
-    { definition: { marks: [] } },
+    { definition: { ...definition, marks: [] } },
     { definition, width: 2001 },
     { definition, height: 2001 },
     { definition, width: 0 },
@@ -101,7 +103,10 @@ describe('POST /', () => {
 
   test('counts data rows across every mark', async () => {
     const mark = { type: 'dot', data: Array.from({ length: 5001 }, () => ({ x: 1, y: 2 })) };
-    const response = await renderRequest(request({ definition: { marks: [mark, mark] } }), allowedLimiter());
+    const response = await renderRequest(
+      request({ definition: { ...definition, marks: [mark, mark] } }),
+      allowedLimiter(),
+    );
     expect(response.status).toBe(400);
     expect(JSON.stringify(await response.json())).toContain('10000 total data rows');
   });
@@ -147,7 +152,10 @@ describe('POST /', () => {
 describe('GET /x', () => {
   test.each(encodings)('renders $name with the same bytes as POST and preserves Unicode', async ({ encode }) => {
     const input = {
-      definition: { ...definition, x: { ...definition.x, label: 'Café 💡 & + / = # ~ (_) * \n' } },
+      definition: {
+        ...definition,
+        scales: { ...definition.scales, x: { ...definition.scales.x, label: 'Café 💡 & + / = # ~ (_) * \n' } },
+      },
       format: 'png',
       width: 240,
       height: 160,
@@ -375,7 +383,10 @@ describe('GET /x', () => {
 
   test('counts data rows across every mark', async () => {
     const mark = { type: 'dot', data: Array.from({ length: 5001 }, () => ({ x: 1, y: 2 })) };
-    const response = await renderRequest(queryRequest({ definition: { marks: [mark, mark] } }), allowedLimiter());
+    const response = await renderRequest(
+      queryRequest({ definition: { ...definition, marks: [mark, mark] } }),
+      allowedLimiter(),
+    );
     expect(response.status).toBe(400);
     expect(JSON.stringify(await response.json())).toContain('10000 total data rows');
   });

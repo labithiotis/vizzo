@@ -79,15 +79,17 @@
         }
       }
     ],
-    "x": {
-      "scale": "point",
-      "label": "Day"
-    },
-    "y": {
-      "scale": "linear",
-      "nice": true,
-      "grid": true,
-      "label": "Active Users"
+    "scales": {
+      "x": {
+        "scale": "point",
+        "label": "Day"
+      },
+      "y": {
+        "scale": "linear",
+        "nice": true,
+        "grid": true,
+        "label": "Active Users"
+      }
     }
   },
   "theme": "light"

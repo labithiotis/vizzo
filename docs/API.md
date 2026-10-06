@@ -20,8 +20,10 @@ curl https://vizzo.dev/ \
         "options": { "x": "x", "y": "y" }
       }
     ],
-    "x": { "scale": "linear" },
-    "y": { "scale": "linear" }
+    "scales": {
+      "x": { "scale": "linear" },
+      "y": { "scale": "linear" }
+    }
   },
   "width": 1200,
   "height": 630,
@@ -91,7 +93,7 @@ Raw JSON remains available:
 ```sh
 curl --get https://vizzo.dev/x \
   --data-urlencode 'width=200' \
-  --data-urlencode 'data={"definition":{"marks":[{"type":"barY","data":[{"letter":"A","frequency":3},{"letter":"B","frequency":7}],"options":{"x":"letter","y":"frequency"}}],"x":{"scale":"band"},"y":{"scale":"linear"}}}' \
+  --data-urlencode 'data={"definition":{"marks":[{"type":"barY","data":[{"letter":"A","frequency":3},{"letter":"B","frequency":7}],"options":{"x":"letter","y":"frequency"}}],"scales":{"x":{"scale":"band"},"y":{"scale":"linear"}}}}' \
   -o chart.png
 ```
 

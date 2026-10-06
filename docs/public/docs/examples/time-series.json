@@ -61,15 +61,17 @@
         }
       }
     ],
-    "x": {
-      "scale": "utc",
-      "label": "Month"
-    },
-    "y": {
-      "scale": "linear",
-      "nice": true,
-      "grid": true,
-      "label": "Signups"
+    "scales": {
+      "x": {
+        "scale": "utc",
+        "label": "Month"
+      },
+      "y": {
+        "scale": "linear",
+        "nice": true,
+        "grid": true,
+        "label": "Signups"
+      }
     }
   },
   "theme": "light"

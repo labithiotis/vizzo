@@ -18,7 +18,8 @@ becomes this JSON mark:
 }
 ```
 
-Put marks inside `{ "definition": { "marks": [...] } }`, then pass that envelope to a URL, POST, the CLI, or the SDK. JSURL2 changes the transport encoding only.
+Put marks and scales inside `definition`, then pass that envelope to the URL, POST, CLI, or SDK.
+JSURL2 changes the transport encoding only.
 
 ## Choose a mark
 
@@ -43,14 +44,26 @@ Layer multiple marks in one `marks` array. Each mark has its own `data` and `opt
 | `ordinal` | `scaleOrdinal()` | Discrete values |
 | `utc` | `scaleUtc()` | UTC dates |
 
-Set scales and axis options on `definition.x` and `definition.y`. `padding`, `nice`, `grid`, `label`, and `axis` map to TanStack's axis options. Set an axis to `null` to disable it. ISO date strings become dates for the UTC scale.
+Set scales and axis options on `definition.scales.x` and `definition.scales.y`. Both entries are required. Use `null`
+only when no mark uses that dimension. Pie and donut charts use `{ "x": null, "y": null }`.
+
+`padding`, `nice`, `grid`, `label`, and `axis` map to TanStack's axis options. Set `axis` to `false` to hide an axis while
+keeping its scale. ISO date strings become dates for the UTC scale.
 
 ```json
 {
-  "x": { "scale": "point", "label": "Month", "padding": 0.2 },
-  "y": { "scale": "linear", "nice": true, "grid": true, "label": "Revenue (USD)" }
+  "scales": {
+    "x": { "scale": "point", "label": "Month", "padding": 0.2 },
+    "y": { "scale": "linear", "nice": true, "grid": true, "label": "Revenue (USD)" }
+  }
 }
 ```
+
+### Migrate from TanStack Charts v0.14
+
+Vizzo uses TanStack Charts v1. Move the former `definition.x` and `definition.y` entries inside `definition.scales`.
+Add both entries to definitions that omitted them, using `null` for unused dimensions. Mark data and options keep
+the same shape. Existing chart files and encoded URLs must use the new scale registry.
 
 ## Group lines and control color
 
